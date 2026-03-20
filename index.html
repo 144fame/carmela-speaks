@@ -1,534 +1,2821 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="theme-color" content="#1e3a5f"/>
-  <title>Carmela Speaks</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Para" />
+  <meta name="theme-color" content="#f5e6d3" />
+  <title>Para — Carmela's Voice</title>
+
+  <!-- PWA Manifest inline -->
+  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiUGFyYSDigJQgQ2FybWVsYeKAmXMgVm9pY2UiLCJzaG9ydF9uYW1lIjoiUGFyYSIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZjVlNmQzIiwidGhlbWVfY29sb3IiOiIjZjVlNmQzIiwib3JpZW50YXRpb24iOiJwb3J0cmFpdCIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWwsdXRmOCwlM0NzdmcgeG1sbnMlM0QnaHR0cCUzQS8vd3d3LnczLm9yZy8yMDAwL3N2ZyclMjB2aWV3Qm94PScwIDAgMTkyIDE5MiclM0UlM0NyZWN0IHdpZHRoJTNEJzE5MicgaGVpZ2h0JTNEJzE5MicgcnglM0QnNDAnIGZpbGwlM0QnJTIzZjhhYjZkJy8lM0UlM0N0ZXh0IHglM0QnOTYnIHklM0QnMTI4JyBmb250LXNpemUlM0QnMTIwJyB0ZXh0LWFuY2hvciUzRCdtaWRkbGUnJTNFJUYwJTlGJUE0JTlEJTNDL3RleHQlM0UlM0Mvc3ZnJTNFIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifV19" />
+
   <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --blue: #1e3a5f;
-      --blue-mid: #2d5282;
-      --accent: #f6c90e;
-      --green: #22c55e;
-      --red: #ef4444;
-      --white: #ffffff;
-      --light: #f0f4ff;
-      --card-bg: #2d5282;
-      --card-hover: #3b6eb5;
-      --shadow: 0 4px 16px rgba(0,0,0,0.3);
-      --radius: 16px;
-      --font-size-btn: clamp(1rem, 3.5vw, 1.5rem);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; overflow: hidden; background: var(--blue); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--white); }
-
-    /* HELP ME BUTTON — always on top */
-    #helpBtn {
-      position: fixed; top: 12px; right: 12px; z-index: 9999;
-      background: var(--red); color: white;
-      border: none; border-radius: 14px;
-      padding: 0.6rem 1.1rem;
-      font-size: clamp(0.9rem, 3vw, 1.2rem);
-      font-weight: 900; cursor: pointer;
-      box-shadow: 0 4px 20px rgba(239,68,68,0.6);
-      animation: pulse 2s infinite;
-      letter-spacing: 0.03em;
-    }
-    @keyframes pulse { 0%,100%{box-shadow:0 4px 20px rgba(239,68,68,0.6);} 50%{box-shadow:0 4px 30px rgba(239,68,68,0.9);} }
-    #helpBtn:active { transform: scale(0.95); }
-
-    /* LAYOUT */
-    #app { display: flex; flex-direction: column; height: 100vh; }
-
-    /* TOP BAR */
-    #topbar {
-      background: var(--blue-mid);
-      padding: 0.6rem 1rem 0.6rem 1rem;
-      display: flex; align-items: center; gap: 0.5rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      flex-shrink: 0;
-    }
-    #topbar h1 { font-size: clamp(0.9rem, 3vw, 1.2rem); font-weight: 800; color: var(--accent); letter-spacing: 0.05em; }
-
-    /* SPEECH BAR */
-    #speechBar {
-      background: #112240;
-      padding: 0.6rem 0.75rem;
-      display: flex; align-items: center; gap: 0.5rem;
-      flex-shrink: 0;
-      min-height: 56px;
-    }
-    #speechText {
-      flex: 1;
-      background: rgba(255,255,255,0.08);
-      border: 2px solid rgba(255,255,255,0.2);
-      border-radius: 12px;
-      padding: 0.5rem 0.75rem;
-      color: white;
-      font-size: clamp(0.85rem, 2.5vw, 1.1rem);
-      min-height: 42px;
-      line-height: 1.4;
-      word-wrap: break-word;
-    }
-    #speechText.has-text { border-color: var(--accent); }
-    .bar-btn {
-      background: var(--card-bg); border: none; border-radius: 12px;
-      color: white; font-size: 1.3rem; cursor: pointer;
-      width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; transition: all 0.15s;
-    }
-    .bar-btn:active { transform: scale(0.92); background: var(--card-hover); }
-    #speakBtn { background: var(--green); font-size: 1rem; font-weight: 700; width: auto; padding: 0 1rem; }
-    #speakBtn.speaking { background: var(--accent); color: var(--blue); animation: speakPulse 0.8s infinite; }
-    @keyframes speakPulse { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
-
-    /* COUNTDOWN OVERLAY */
-    #countdownOverlay {
-      display: none;
-      position: fixed; inset: 0; z-index: 5000;
-      background: rgba(0,0,0,0.85);
-      align-items: center; justify-content: center;
-      flex-direction: column; gap: 1rem;
-    }
-    #countdownOverlay.active { display: flex; }
-    #countdownNum {
-      font-size: clamp(5rem, 20vw, 10rem); font-weight: 900;
-      color: var(--accent); line-height: 1;
-      animation: countScale 1s ease-in-out;
-    }
-    @keyframes countScale { 0%{transform:scale(1.4);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-    #countdownLabel { font-size: clamp(1.2rem, 4vw, 1.8rem); color: white; opacity: 0.85; }
-    #cancelCountdown {
-      margin-top: 1rem; background: var(--red); color: white;
-      border: none; border-radius: 14px; padding: 0.75rem 2rem;
-      font-size: 1.1rem; font-weight: 700; cursor: pointer;
+      --cream: #fdf6ee;
+      --peach: #f8d5b0;
+      --peach-dark: #f0b07a;
+      --warm-brown: #8b5a2b;
+      --soft-green: #7ec87a;
+      --soft-red: #e57373;
+      --soft-blue: #64b5f6;
+      --soft-purple: #ba68c8;
+      --soft-yellow: #ffd54f;
+      --soft-orange: #ff9800;
+      --card-radius: 24px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.12);
+      --shadow-hover: 0 16px 48px rgba(0,0,0,0.22);
+      --font: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --min-font: 22px;
+      --timeout: 5;
     }
 
-    /* CATEGORY TABS */
-    #tabs {
-      display: flex; gap: 0.4rem; padding: 0.5rem 0.75rem;
-      overflow-x: auto; flex-shrink: 0;
-      scrollbar-width: none; -ms-overflow-style: none;
-      background: var(--blue);
-    }
-    #tabs::-webkit-scrollbar { display: none; }
-    .tab {
-      background: var(--card-bg); border: none; border-radius: 20px;
-      color: rgba(255,255,255,0.7); padding: 0.4rem 0.9rem;
-      font-size: clamp(0.75rem, 2.5vw, 0.9rem); font-weight: 600;
-      cursor: pointer; white-space: nowrap; transition: all 0.2s;
-      flex-shrink: 0;
-    }
-    .tab.active { background: var(--accent); color: var(--blue); }
-    .tab:active { transform: scale(0.95); }
-
-    /* GRID */
-    #grid {
-      flex: 1; overflow-y: auto; padding: 0.6rem 0.6rem 1rem;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.5rem;
-      align-content: start;
-    }
-    @media (max-width: 400px) { #grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (min-width: 768px) { #grid { grid-template-columns: repeat(4, 1fr); gap: 0.75rem; } }
-    @media (min-width: 1024px) { #grid { grid-template-columns: repeat(5, 1fr); } }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 0.75rem 0.5rem;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 0.35rem;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: all 0.15s;
-      min-height: 90px;
-      text-align: center;
+    body {
+      font-family: var(--font);
+      background: linear-gradient(160deg, var(--cream) 0%, var(--peach) 100%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
       user-select: none;
       -webkit-user-select: none;
+      touch-action: manipulation;
     }
-    .card:active { transform: scale(0.93); background: var(--card-hover); border-color: var(--accent); }
-    .card.selected { border-color: var(--accent); background: #1a4b8c; }
-    .card-emoji { font-size: clamp(1.8rem, 6vw, 2.5rem); line-height: 1; }
+
+    body.dark-mode {
+      --cream: #1a1208;
+      --peach: #2a1e0e;
+      --peach-dark: #3a2a14;
+      --warm-brown: #d4a373;
+      background: linear-gradient(160deg, #1a1208 0%, #2a1e0e 100%);
+    }
+
+    /* ============================================================
+       APP SHELL
+    ============================================================ */
+    #app {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       TOP BAR
+    ============================================================ */
+    #topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.35);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.4);
+      min-height: 60px;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    #topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #app-name {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--warm-brown);
+      letter-spacing: -0.5px;
+    }
+
+    #greeting-name {
+      font-size: 18px;
+      color: #a0724a;
+      font-weight: 500;
+    }
+
+    #topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Listening indicator */
+    #listen-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(100, 181, 246, 0.25);
+      border-radius: 20px;
+      font-size: 13px;
+      color: #1565c0;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    #listen-indicator.active {
+      background: rgba(100, 181, 246, 0.5);
+      animation: pulse-listen 2s infinite;
+    }
+
+    #listen-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #42a5f5;
+    }
+
+    #listen-indicator.active #listen-dot {
+      animation: pulse-dot 1s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    @keyframes pulse-listen {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(100,181,246,0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(100,181,246,0); }
+    }
+
+    .icon-btn {
+      background: rgba(255,255,255,0.5);
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.9);
+      background: rgba(255,255,255,0.8);
+    }
+
+    /* ============================================================
+       PARA STATUS BAR (what Para is saying/doing)
+    ============================================================ */
+    #para-status {
+      padding: 8px 20px;
+      background: rgba(255,255,255,0.2);
+      font-size: 16px;
+      color: var(--warm-brown);
+      font-style: italic;
+      text-align: center;
+      min-height: 38px;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    #para-avatar {
+      font-size: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    #para-text {
+      flex: 1;
+      transition: opacity 0.3s;
+    }
+
+    /* ============================================================
+       MAIN CONTENT AREA
+    ============================================================ */
+    #main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ============================================================
+       CARDS GRID
+    ============================================================ */
+    #cards-container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      align-items: center;
+      padding: 8px;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    #cards-container.fade-out {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    #cards-container.fade-in {
+      animation: cardsFadeIn 0.5s ease forwards;
+    }
+
+    @keyframes cardsFadeIn {
+      from { opacity: 0; transform: scale(0.95) translateY(20px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .choice-card {
+      min-width: 150px;
+      min-height: 150px;
+      flex: 1 1 160px;
+      max-width: 220px;
+      border-radius: var(--card-radius);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 12px;
+      box-shadow: var(--shadow);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      overflow: hidden;
+      font-family: var(--font);
+    }
+
+    .choice-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .choice-card:hover::after { opacity: 1; }
+
+    .choice-card:active {
+      transform: scale(0.93);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .choice-card.selected {
+      transform: scale(1.08);
+      box-shadow: var(--shadow-hover), 0 0 0 6px rgba(255,255,255,0.8);
+      animation: selected-bounce 0.4s ease;
+    }
+
+    @keyframes selected-bounce {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.15); }
+      70%  { transform: scale(1.04); }
+      100% { transform: scale(1.08); }
+    }
+
+    .card-emoji {
+      font-size: 64px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
     .card-label {
-      font-size: clamp(0.65rem, 2vw, 0.85rem);
-      font-weight: 600; color: rgba(255,255,255,0.9);
+      font-size: var(--min-font);
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.25);
       line-height: 1.2;
     }
 
-    /* QUICK PHRASES special section */
-    .phrase-card {
-      background: #1a3a6c;
-      border-radius: var(--radius);
-      padding: 0.65rem 0.5rem;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: all 0.15s;
-      min-height: 60px;
+    /* Progress ring for timeout */
+    .card-timer-ring {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 28px;
+      height: 28px;
+      display: none;
+    }
+
+    .card-timer-ring.visible { display: block; }
+
+    .ring-svg { transform: rotate(-90deg); }
+
+    .ring-bg { fill: none; stroke: rgba(255,255,255,0.3); stroke-width: 3; }
+    .ring-fg { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round;
+                transition: stroke-dashoffset 1s linear; }
+
+    /* YES/NO special layout */
+    .choice-card.yes-card { background: linear-gradient(135deg, #43a047, #66bb6a); }
+    .choice-card.no-card  { background: linear-gradient(135deg, #e53935, #ef5350); }
+
+    /* Color palette for regular cards */
+    .card-color-0  { background: linear-gradient(135deg, #6a9fd8, #5b8ec7); }
+    .card-color-1  { background: linear-gradient(135deg, #e07b54, #d4694a); }
+    .card-color-2  { background: linear-gradient(135deg, #7cb87a, #6aaa68); }
+    .card-color-3  { background: linear-gradient(135deg, #c47fc0, #b36daf); }
+    .card-color-4  { background: linear-gradient(135deg, #d4a843, #c49633); }
+    .card-color-5  { background: linear-gradient(135deg, #5fb5c8, #4aa3b8); }
+    .card-color-6  { background: linear-gradient(135deg, #e8855a, #d97548); }
+    .card-color-7  { background: linear-gradient(135deg, #8e6bbf, #7d5aae); }
+
+    /* ============================================================
+       IDLE STATE (waiting for input)
+    ============================================================ */
+    #idle-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
       text-align: center;
-      user-select: none;
-    }
-    .phrase-card:active { transform: scale(0.94); border-color: var(--accent); }
-    .phrase-text { font-size: clamp(0.7rem, 2.2vw, 0.9rem); font-weight: 600; color: white; }
-    #phrasesGrid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    @media (min-width: 600px) { #phrasesGrid { grid-template-columns: repeat(3, 1fr); } }
-
-    /* HELP overlay */
-    #helpOverlay {
-      display: none; position: fixed; inset: 0; z-index: 8000;
-      background: rgba(239,68,68,0.95);
-      align-items: center; justify-content: center;
-      flex-direction: column; gap: 1.5rem;
-      text-align: center; padding: 2rem;
-    }
-    #helpOverlay.active { display: flex; }
-    #helpOverlay h2 { font-size: clamp(2rem, 8vw, 3.5rem); font-weight: 900; }
-    #helpOverlay p { font-size: clamp(1rem, 3.5vw, 1.4rem); opacity: 0.9; max-width: 500px; }
-    #closeHelp {
-      background: white; color: var(--red); border: none;
-      border-radius: 14px; padding: 1rem 2.5rem;
-      font-size: 1.2rem; font-weight: 800; cursor: pointer;
-    }
-    #helpActions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
-    .help-action-btn {
-      background: rgba(255,255,255,0.2); color: white;
-      border: 2px solid rgba(255,255,255,0.5);
-      border-radius: 12px; padding: 0.75rem 1.5rem;
-      font-size: 1rem; font-weight: 700; cursor: pointer;
+      padding: 32px;
     }
 
-    /* Settings panel */
-    #settingsPanel {
-      display: none; position: fixed; inset: 0; z-index: 7000;
-      background: rgba(0,0,0,0.8); align-items: center; justify-content: center;
+    #idle-para-icon {
+      font-size: 96px;
+      animation: float 4s ease-in-out infinite;
     }
-    #settingsPanel.active { display: flex; }
-    .settings-box {
-      background: var(--blue-mid); border-radius: 20px;
-      padding: 2rem; width: 90%; max-width: 400px;
-      display: flex; flex-direction: column; gap: 1.2rem;
+
+    #idle-message {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--warm-brown);
+      max-width: 400px;
+      line-height: 1.3;
     }
-    .settings-box h3 { font-size: 1.3rem; font-weight: 800; color: var(--accent); }
-    .setting-row { display: flex; justify-content: space-between; align-items: center; }
-    .setting-row label { font-size: 0.95rem; font-weight: 600; }
-    .setting-row input[type=range] { width: 140px; }
-    .setting-row select { background: var(--blue); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 0.3rem 0.5rem; font-size: 0.9rem; }
-    .btn-close-settings { background: var(--accent); color: var(--blue); border: none; border-radius: 10px; padding: 0.65rem 1.5rem; font-weight: 800; cursor: pointer; align-self: flex-end; }
+
+    #idle-hint {
+      font-size: 18px;
+      color: #a0724a;
+      max-width: 360px;
+      line-height: 1.5;
+    }
+
+    .idle-wave {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .idle-wave span {
+      width: 8px;
+      height: 8px;
+      background: var(--soft-blue);
+      border-radius: 50%;
+      animation: wave-dot 1.4s ease-in-out infinite;
+    }
+
+    .idle-wave span:nth-child(2) { animation-delay: 0.2s; }
+    .idle-wave span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes wave-dot {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* ============================================================
+       HELP BUTTON (always visible)
+    ============================================================ */
+    #help-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #c62828, #e53935);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 16px 48px;
+      font-size: 22px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(229,57,53,0.5);
+      z-index: 200;
+      letter-spacing: 1px;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      animation: help-pulse 4s ease-in-out infinite;
+    }
+
+    #help-btn:active {
+      transform: translateX(-50%) scale(0.95);
+    }
+
+    @keyframes help-pulse {
+      0%, 90%, 100% { box-shadow: 0 6px 24px rgba(229,57,53,0.5); }
+      95% { box-shadow: 0 6px 40px rgba(229,57,53,0.9); }
+    }
+
+    /* ============================================================
+       TIMEOUT PROGRESS BAR (full width, under cards)
+    ============================================================ */
+    #timeout-bar-wrap {
+      width: 100%;
+      max-width: 600px;
+      margin-top: 12px;
+      height: 8px;
+      background: rgba(0,0,0,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      display: none;
+    }
+
+    #timeout-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--soft-green), var(--soft-blue));
+      border-radius: 4px;
+      width: 100%;
+      transition: width linear;
+    }
+
+    /* ============================================================
+       CONFIRMATION OVERLAY
+    ============================================================ */
+    #confirmation-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    #confirmation-overlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #confirmation-box {
+      background: white;
+      border-radius: 32px;
+      padding: 40px 48px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      animation: pop-in 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    @keyframes pop-in {
+      from { transform: scale(0.7); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    #confirmation-emoji { font-size: 80px; margin-bottom: 16px; }
+    #confirmation-text  { font-size: 26px; font-weight: 700; color: #333; margin-bottom: 8px; }
+    #confirmation-sub   { font-size: 18px; color: #777; }
+
+    /* Stars burst for positive feedback */
+    .star-burst {
+      position: fixed;
+      pointer-events: none;
+      z-index: 600;
+      font-size: 32px;
+      animation: star-fly 1s ease forwards;
+    }
+
+    @keyframes star-fly {
+      from { opacity: 1; transform: translate(0,0) scale(0.5); }
+      to   { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.5); }
+    }
+
+    /* ============================================================
+       SEARCHING ANIMATION
+    ============================================================ */
+    #searching-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(253,246,238,0.92);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 400;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    #searching-overlay.visible { opacity: 1; pointer-events: all; }
+
+    #searching-spinner {
+      width: 80px;
+      height: 80px;
+      border: 6px solid rgba(248,171,109,0.3);
+      border-top: 6px solid var(--peach-dark);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #searching-text { font-size: 24px; color: var(--warm-brown); font-weight: 600; }
+
+    /* ============================================================
+       SETTINGS / PARENT VIEW
+    ============================================================ */
+    #settings-panel {
+      position: fixed;
+      inset: 0;
+      background: var(--cream);
+      z-index: 300;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    #settings-panel.open { transform: translateX(0); }
+
+    #settings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+    #settings-header h1 { font-size: 28px; color: var(--warm-brown); font-weight: 800; }
+
+    .settings-close {
+      background: rgba(0,0,0,0.08);
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #settings-body { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+
+    .settings-section {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .settings-section h2 {
+      font-size: 20px;
+      color: var(--warm-brown);
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .setting-row:last-child { border-bottom: none; }
+    .setting-label { font-size: 17px; color: #333; font-weight: 500; }
+    .setting-sub   { font-size: 13px; color: #888; margin-top: 2px; }
+
+    /* Toggle switch */
+    .toggle {
+      position: relative;
+      width: 52px;
+      height: 30px;
+      flex-shrink: 0;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: #ccc;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      left: 4px;
+      top: 4px;
+      transition: 0.3s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .toggle input:checked + .toggle-slider { background: var(--soft-green); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(22px); }
+
+    /* Range slider */
+    .setting-range {
+      width: 100%;
+      margin-top: 8px;
+      accent-color: var(--peach-dark);
+      height: 6px;
+    }
+
+    .setting-range-label { display: flex; justify-content: space-between; font-size: 14px; color: #888; margin-top: 4px; }
+
+    /* Favorites tags */
+    .tags-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+    .tag {
+      background: var(--peach);
+      color: var(--warm-brown);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .tag.active { background: var(--peach-dark); color: white; }
+
+    .tag .remove-tag {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-left: 2px;
+    }
+
+    .add-tag-btn {
+      background: rgba(0,0,0,0.06);
+      border: 2px dashed rgba(0,0,0,0.15);
+      color: #888;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Onboarding */
+    #onboarding-modal {
+      position: fixed;
+      inset: 0;
+      background: var(--cream);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: opacity 0.4s;
+    }
+
+    #onboarding-modal.hidden { display: none; }
+
+    #ob-header {
+      display: flex;
+      align-items: center;
+      padding: 20px 24px 0;
+      gap: 12px;
+    }
+
+    #ob-logo { font-size: 36px; }
+    #ob-title { font-size: 22px; font-weight: 800; color: var(--warm-brown); }
+
+    #ob-progress-wrap {
+      padding: 16px 24px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .ob-dot {
+      height: 6px;
+      flex: 1;
+      background: rgba(0,0,0,0.12);
+      border-radius: 3px;
+      transition: background 0.4s;
+    }
+
+    .ob-dot.done { background: var(--peach-dark); }
+
+    #ob-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 24px 24px;
+    }
+
+    .ob-step { display: none; }
+    .ob-step.active { display: block; }
+
+    .ob-step h2 {
+      font-size: 26px;
+      color: var(--warm-brown);
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .ob-step p {
+      font-size: 17px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .ob-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 18px;
+      border: 2px solid rgba(0,0,0,0.12);
+      border-radius: 14px;
+      background: white;
+      font-family: var(--font);
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .ob-input:focus { border-color: var(--peach-dark); }
+
+    .photo-upload-area {
+      border: 3px dashed rgba(0,0,0,0.15);
+      border-radius: 20px;
+      padding: 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(255,255,255,0.5);
+      margin-bottom: 16px;
+    }
+
+    .photo-upload-area:hover { border-color: var(--peach-dark); background: rgba(255,255,255,0.8); }
+
+    .photo-upload-area img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 8px;
+    }
+
+    #ob-footer {
+      padding: 16px 24px 32px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .ob-btn {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      border-radius: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+    }
+
+    .ob-btn:active { transform: scale(0.97); }
+
+    .ob-btn-primary { background: var(--peach-dark); color: white; }
+    .ob-btn-secondary { background: rgba(0,0,0,0.08); color: #555; flex: 0 0 auto; padding: 16px 24px; }
+
+    /* History log */
+    .history-list { list-style: none; }
+
+    .history-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      align-items: flex-start;
+    }
+
+    .history-icon { font-size: 28px; flex-shrink: 0; }
+
+    .history-info { flex: 1; }
+
+    .history-choice { font-size: 17px; font-weight: 600; color: #333; }
+    .history-context { font-size: 14px; color: #888; margin-top: 2px; }
+    .history-time { font-size: 13px; color: #aaa; flex-shrink: 0; }
+
+    /* Voice selector */
+    .voice-option {
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 2px solid rgba(0,0,0,0.1);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .voice-option.selected { border-color: var(--peach-dark); background: rgba(240,176,122,0.12); }
+
+    .voice-name { font-size: 16px; font-weight: 600; color: #333; }
+    .voice-lang { font-size: 13px; color: #888; }
+
+    /* Engagement mode */
+    #engage-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 250;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    #engage-overlay.visible { opacity: 1; pointer-events: all; }
+
+    #engage-box {
+      background: white;
+      border-radius: 28px;
+      padding: 32px;
+      max-width: 380px;
+      width: 90%;
+      text-align: center;
+    }
+
+    #engage-box h2 { font-size: 22px; color: var(--warm-brown); font-weight: 800; margin-bottom: 12px; }
+    #engage-box p  { font-size: 16px; color: #666; margin-bottom: 20px; line-height: 1.5; }
+
+    .engage-btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 10px;
+      font-family: var(--font);
+      transition: all 0.2s;
+    }
+
+    .engage-btn:active { transform: scale(0.97); }
+    .engage-btn-primary { background: var(--peach-dark); color: white; }
+    .engage-btn-secondary { background: rgba(0,0,0,0.06); color: #555; }
+
+    /* Quick actions (shown in idle) */
+    #quick-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .quick-action-btn {
+      background: rgba(255,255,255,0.6);
+      border: 2px solid rgba(255,255,255,0.8);
+      border-radius: 50px;
+      padding: 10px 20px;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--warm-brown);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .quick-action-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.85); }
+
+    /* Notification/Alert bar */
+    #alert-bar {
+      position: fixed;
+      top: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      z-index: 700;
+      transition: top 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      white-space: nowrap;
+      max-width: 90vw;
+    }
+
+    #alert-bar.show { top: 80px; }
+
+    /* Dark mode toggle context */
+    .dark-mode #app-name { color: var(--warm-brown); }
+    .dark-mode #idle-message { color: var(--warm-brown); }
+    .dark-mode #idle-hint { color: #c49a6a; }
+    .dark-mode .settings-section { background: rgba(255,255,255,0.07); }
+    .dark-mode .ob-input { background: rgba(255,255,255,0.07); color: white; }
+    .dark-mode #settings-panel { background: #1a1208; }
+    .dark-mode .settings-section h2 { color: var(--warm-brown); }
+
+    /* YouTube embed */
+    #youtube-container {
+      width: 100%;
+      max-width: 640px;
+      aspect-ratio: 16/9;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: none;
+      margin-bottom: 12px;
+    }
+
+    #youtube-container.visible { display: block; }
+    #youtube-container iframe { width: 100%; height: 100%; border: none; }
+
+    /* Person card (photo-based) */
+    .person-card-photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 8px;
+      border: 3px solid rgba(255,255,255,0.5);
+    }
+
+    /* Safety alert */
+    #safety-alert {
+      position: fixed;
+      bottom: 90px;
+      right: 16px;
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: #856404;
+      z-index: 250;
+      max-width: 220px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      display: none;
+    }
+
+    #safety-alert.show { display: block; animation: slideInRight 0.3s ease; }
+
+    @keyframes slideInRight {
+      from { transform: translateX(30px); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Responsive */
+    @media (max-height: 600px) {
+      .card-emoji { font-size: 44px; }
+      .choice-card { min-height: 120px; }
+      #idle-para-icon { font-size: 60px; }
+      #idle-message { font-size: 22px; }
+    }
+
+    @media (min-width: 768px) {
+      .choice-card {
+        min-width: 180px;
+        min-height: 180px;
+        flex: 0 1 200px;
+      }
+      .card-emoji { font-size: 72px; }
+      .card-label { font-size: 26px; }
+    }
+
+    @media (min-width: 1024px) {
+      .choice-card { flex: 0 1 210px; min-height: 200px; }
+    }
+
+    /* Transcript popup */
+    #transcript-bubble {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 16px;
+      z-index: 150;
+      opacity: 0;
+      transition: opacity 0.3s;
+      max-width: 80vw;
+      text-align: center;
+    }
+
+    #transcript-bubble.visible { opacity: 1; }
+
+    /* Celebration animation */
+    @keyframes celebrate-spin {
+      from { transform: rotate(0deg) scale(0); opacity: 1; }
+      to   { transform: rotate(720deg) scale(2); opacity: 0; }
+    }
+
+    .celebrate-star {
+      position: fixed;
+      font-size: 36px;
+      pointer-events: none;
+      z-index: 600;
+      animation: celebrate-spin 1.2s ease forwards;
+    }
+
+    /* Pulse for important elements */
+    @keyframes gentle-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+
   </style>
 </head>
 <body>
 
-<!-- HELP ME (always visible) -->
-<button id="helpBtn" onclick="showHelp()">🆘 HELP ME</button>
-
-<!-- COUNTDOWN OVERLAY -->
-<div id="countdownOverlay">
-  <div id="countdownNum">5</div>
-  <div id="countdownLabel">Speaking in...</div>
-  <button id="cancelCountdown" onclick="cancelCountdown()">✕ Cancel</button>
-</div>
-
-<!-- HELP OVERLAY -->
-<div id="helpOverlay">
-  <div style="font-size:4rem">🆘</div>
-  <h2>HELP ME!</h2>
-  <p>Carmela needs help right now.</p>
-  <div id="helpActions">
-    <button class="help-action-btn" onclick="speakText('I need help right now please come to me'); closeHelp()">📢 Say It</button>
-    <a href="tel:911" style="text-decoration:none"><button class="help-action-btn">📞 Call 911</button></a>
+<!-- ============================================================
+     ONBOARDING MODAL
+============================================================ -->
+<div id="onboarding-modal">
+  <div id="ob-header">
+    <span id="ob-logo">🤝</span>
+    <div>
+      <div id="ob-title">Welcome to Para</div>
+      <div style="font-size:14px;color:#888;">Let's set up Carmela's voice</div>
+    </div>
   </div>
-  <button id="closeHelp" onclick="closeHelp()">I'm OK — Go Back</button>
-</div>
 
-<!-- SETTINGS -->
-<div id="settingsPanel">
-  <div class="settings-box">
-    <h3>⚙️ Settings</h3>
-    <div class="setting-row">
-      <label>Speech Rate</label>
-      <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="0.9" oninput="updateRate(this.value)"/>
+  <div id="ob-progress-wrap">
+    <div class="ob-dot" id="dot-0"></div>
+    <div class="ob-dot" id="dot-1"></div>
+    <div class="ob-dot" id="dot-2"></div>
+    <div class="ob-dot" id="dot-3"></div>
+    <div class="ob-dot" id="dot-4"></div>
+    <div class="ob-dot" id="dot-5"></div>
+  </div>
+
+  <div id="ob-content">
+    <!-- Step 0: About Carmela -->
+    <div class="ob-step active" id="ob-step-0">
+      <h2>Tell me about Carmela 💛</h2>
+      <p>This helps Para speak to her in the right way, with love and patience.</p>
+      <input class="ob-input" id="ob-name" type="text" placeholder="Carmela's name" value="Carmela" />
+      <input class="ob-input" id="ob-age" type="number" placeholder="Her age" value="17" />
+      <div class="photo-upload-area" id="photo-upload-area" onclick="document.getElementById('ob-photo-input').click()">
+        <img id="ob-photo-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23f8d5b0'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-size='50'%3E👧%3C/text%3E%3C/svg%3E" alt="Photo" />
+        <div style="font-size:16px;color:#888;margin-top:8px;">Tap to add Carmela's photo</div>
+        <div style="font-size:13px;color:#aaa;">(optional, shows on home screen)</div>
+      </div>
+      <input type="file" id="ob-photo-input" accept="image/*" style="display:none" onchange="handlePhotoUpload(event,'ob-photo-preview','carmela_photo')" />
+      <input class="ob-input" id="ob-parent-name" type="text" placeholder="Your name (parent/caregiver)" value="" />
     </div>
-    <div class="setting-row">
-      <label>Volume</label>
-      <input type="range" id="volSlider" min="0" max="1" step="0.1" value="1" oninput="updateVol(this.value)"/>
+
+    <!-- Step 1: Her Favorites -->
+    <div class="ob-step" id="ob-step-1">
+      <h2>What does Carmela love? 🌟</h2>
+      <p>Para will use these to start conversations and present her favorites first.</p>
+
+      <div style="margin-bottom:16px">
+        <div style="font-size:16px;font-weight:700;color:#555;margin-bottom:8px;">🎵 Favorite Music</div>
+        <div class="tags-wrap" id="fav-music-tags"></div>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <div style="font-size:16px;font-weight:700;color:#555;margin-bottom:8px;">📺 Favorite Shows</div>
+        <div class="tags-wrap" id="fav-tv-tags"></div>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <div style="font-size:16px;font-weight:700;color:#555;margin-bottom:8px;">🍽️ Favorite Foods</div>
+        <div class="tags-wrap" id="fav-food-tags"></div>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <div style="font-size:16px;font-weight:700;color:#555;margin-bottom:8px;">🥤 Favorite Drinks</div>
+        <div class="tags-wrap" id="fav-drink-tags"></div>
+      </div>
     </div>
-    <div class="setting-row">
-      <label>Voice</label>
-      <select id="voiceSelect" onchange="updateVoice()"></select>
+
+    <!-- Step 2: Her People -->
+    <div class="ob-step" id="ob-step-2">
+      <h2>Her people 👨‍👩‍👧</h2>
+      <p>Add family members and caregivers. Para will recognize who's around and can help Carmela "talk" to them.</p>
+      <div id="people-list" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px"></div>
+      <button class="ob-btn ob-btn-primary" onclick="addPersonEntry()" style="width:100%;margin-bottom:0">+ Add a person</button>
+      <div style="margin-top:12px;font-size:13px;color:#aaa;text-align:center">
+        <!-- FUTURE: facial recognition API would connect here -->
+        Full face recognition coming soon — for now, names help Para greet the right person!
+      </div>
     </div>
-    <div class="setting-row">
-      <label>Countdown</label>
-      <input type="range" id="countdownSlider" min="0" max="10" step="1" value="5" oninput="updateCountdown(this.value)"/>
-      <span id="countdownVal">5s</span>
+
+    <!-- Step 3: Para's Voice -->
+    <div class="ob-step" id="ob-step-3">
+      <h2>Para's voice 🎙️</h2>
+      <p>Choose how Para sounds. A warm, gentle voice makes all the difference.</p>
+      <div id="voice-list" style="margin-bottom:16px"></div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:16px;font-weight:600;color:#555;margin-bottom:8px">Speaking rate</div>
+        <input type="range" class="setting-range" id="ob-rate" min="0.5" max="1.2" step="0.05" value="0.85" oninput="updateRateDisplay(this.value)" />
+        <div class="setting-range-label"><span>Slow</span><span id="rate-display">0.85</span><span>Fast</span></div>
+      </div>
+      <button class="ob-btn ob-btn-primary" onclick="testParaVoice()" style="width:100%">🔊 Test Para's Voice</button>
     </div>
-    <button class="btn-close-settings" onclick="closeSettings()">Done</button>
+
+    <!-- Step 4: Timing -->
+    <div class="ob-step" id="ob-step-4">
+      <h2>Timing ⏱️</h2>
+      <p>How long should Para wait before repeating the question? Give Carmela enough time to process and respond.</p>
+      <input type="range" class="setting-range" id="ob-timeout" min="3" max="10" step="1" value="5"
+             oninput="document.getElementById('timeout-display').textContent=this.value+'s'" />
+      <div class="setting-range-label">
+        <span>3 seconds</span>
+        <span id="timeout-display">5s</span>
+        <span>10 seconds</span>
+      </div>
+      <div style="margin-top:24px;padding:20px;background:rgba(248,171,109,0.15);border-radius:16px;">
+        <div style="font-size:15px;color:#666;line-height:1.6;">
+          💡 <strong>Tip:</strong> For kids with apraxia, longer timing (6-8s) is often better.
+          Para will repeat once, then gently select the last-chosen option if needed.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5: Done -->
+    <div class="ob-step" id="ob-step-5">
+      <h2 style="text-align:center">All set! 🎉</h2>
+      <div style="text-align:center;margin-bottom:24px">
+        <div id="done-avatar" style="font-size:100px;margin-bottom:16px">🤝</div>
+        <p style="font-size:20px;color:var(--warm-brown);font-weight:600">Para is ready to be Carmela's voice.</p>
+        <p style="font-size:16px;color:#888;line-height:1.6;margin-top:12px">
+          Speak naturally near the device. Para will listen and help Carmela respond.
+          You can always change settings with the gear icon.
+        </p>
+      </div>
+      <div style="background:rgba(126,200,122,0.15);border-radius:16px;padding:20px;">
+        <div style="font-size:15px;color:#444;line-height:1.8">
+          ✅ Speak: <em>"Do you want milk or juice?"</em><br>
+          ✅ Speak: <em>"Para, find Wheels on the Bus"</em><br>
+          ✅ Speak: <em>"How are you feeling?"</em><br>
+          ✅ Say: <em>"Para, engage"</em> to start a conversation<br>
+          🔴 Red button = Help me, right now
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ob-footer">
+    <button class="ob-btn ob-btn-secondary" id="ob-back-btn" onclick="obNavigate(-1)" style="display:none">Back</button>
+    <button class="ob-btn ob-btn-primary" id="ob-next-btn" onclick="obNavigate(1)">Let's go →</button>
   </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- ============================================================
+     MAIN APP
+============================================================ -->
 <div id="app">
+  <!-- Top bar -->
   <div id="topbar">
-    <h1>🦋 Carmela Speaks</h1>
-    <div style="flex:1"></div>
-    <button class="bar-btn" onclick="openSettings()" title="Settings">⚙️</button>
+    <div id="topbar-left">
+      <span id="app-name">Para</span>
+      <span id="greeting-name"></span>
+    </div>
+    <div id="topbar-right">
+      <div id="listen-indicator" title="Para is listening">
+        <div id="listen-dot"></div>
+        <span id="listen-label">Listening…</span>
+      </div>
+      <button class="icon-btn" onclick="toggleDarkMode()" title="Dark mode" id="dark-btn">🌙</button>
+      <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
+    </div>
   </div>
 
-  <div id="speechBar">
-    <div id="speechText" class="speechText"></div>
-    <button class="bar-btn" onclick="clearSpeech()" title="Clear">🗑️</button>
-    <button class="bar-btn" onclick="deleteLast()" title="Delete last word">⌫</button>
-    <button id="speakBtn" class="bar-btn" onclick="triggerSpeak()">▶ SPEAK</button>
+  <!-- Para status -->
+  <div id="para-status">
+    <span id="para-avatar">🤝</span>
+    <span id="para-text">Para is here with you…</span>
   </div>
 
-  <div id="tabs">
-    <button class="tab active" onclick="showCategory('needs', this)">🙏 Needs</button>
-    <button class="tab" onclick="showCategory('feelings', this)">💭 Feelings</button>
-    <button class="tab" onclick="showCategory('body', this)">🫀 Body</button>
-    <button class="tab" onclick="showCategory('food', this)">🍎 Food</button>
-    <button class="tab" onclick="showCategory('activities', this)">🎮 Activities</button>
-    <button class="tab" onclick="showCategory('people', this)">👥 People</button>
-    <button class="tab" onclick="showCategory('places', this)">📍 Places</button>
-    <button class="tab" onclick="showCategory('phrases', this)">💬 Phrases</button>
+  <!-- Main content -->
+  <div id="main-content">
+    <!-- YouTube embed -->
+    <div id="youtube-container">
+      <iframe id="youtube-iframe" allowfullscreen allow="autoplay"></iframe>
+    </div>
+
+    <!-- Idle screen (no cards showing) -->
+    <div id="idle-screen">
+      <div id="idle-para-icon">🤝</div>
+      <div id="idle-message">Hi Carmela! 👋</div>
+      <div id="idle-hint">Para is listening for what you need…</div>
+      <div class="idle-wave">
+        <span></span><span></span><span></span>
+      </div>
+      <div id="quick-actions">
+        <button class="quick-action-btn" onclick="showYesNo('Are you feeling okay?')">How are you? 😊</button>
+        <button class="quick-action-btn" onclick="showCategory('food')">Food 🍽️</button>
+        <button class="quick-action-btn" onclick="showCategory('drinks')">Drink 🥤</button>
+        <button class="quick-action-btn" onclick="showCategory('activities')">Activity 🎮</button>
+        <button class="quick-action-btn" onclick="showCategory('feelings')">Feelings 💭</button>
+        <button class="quick-action-btn" onclick="showCategory('music')">Music 🎵</button>
+      </div>
+    </div>
+
+    <!-- Cards container -->
+    <div id="cards-container" style="display:none"></div>
+
+    <!-- Timeout bar -->
+    <div id="timeout-bar-wrap">
+      <div id="timeout-bar"></div>
+    </div>
   </div>
 
-  <div id="grid"></div>
+  <!-- Help button -->
+  <button id="help-btn" onclick="triggerHelp()">🚨 HELP ME</button>
 </div>
+
+<!-- ============================================================
+     OVERLAYS
+============================================================ -->
+
+<!-- Confirmation -->
+<div id="confirmation-overlay">
+  <div id="confirmation-box">
+    <div id="confirmation-emoji">⭐</div>
+    <div id="confirmation-text">Great choice!</div>
+    <div id="confirmation-sub">Well done, Carmela!</div>
+  </div>
+</div>
+
+<!-- Searching -->
+<div id="searching-overlay">
+  <div id="searching-spinner"></div>
+  <div id="searching-text">Para is searching…</div>
+</div>
+
+<!-- Engage mode -->
+<div id="engage-overlay">
+  <div id="engage-box">
+    <h2>🌟 Let's talk, Carmela!</h2>
+    <p id="engage-question">What would you like to do?</p>
+    <button class="engage-btn engage-btn-primary" onclick="closeEngage()">Start chatting ✨</button>
+    <button class="engage-btn engage-btn-secondary" onclick="closeEngage()">Maybe later</button>
+  </div>
+</div>
+
+<!-- Alert bar -->
+<div id="alert-bar"></div>
+
+<!-- Transcript bubble -->
+<div id="transcript-bubble"></div>
+
+<!-- Safety alert -->
+<div id="safety-alert">⚠️ Unfamiliar voice detected. Check who's nearby.</div>
+
+<!-- ============================================================
+     SETTINGS PANEL
+============================================================ -->
+<div id="settings-panel">
+  <div id="settings-header">
+    <h1>⚙️ Settings</h1>
+    <button class="settings-close" onclick="closeSettings()">✕</button>
+  </div>
+  <div id="settings-body">
+
+    <!-- Carmela profile -->
+    <div class="settings-section">
+      <h2>👧 About Carmela</h2>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Name</div>
+        </div>
+        <input id="s-name" class="ob-input" style="width:140px;margin:0;padding:8px 12px;font-size:16px"
+               onchange="saveSetting('user_name',this.value);updateGreeting()" />
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">Photo</div>
+        <button class="ob-btn ob-btn-secondary" onclick="document.getElementById('s-photo-input').click()" style="padding:8px 16px;font-size:14px">Change</button>
+        <input type="file" id="s-photo-input" accept="image/*" style="display:none" onchange="handlePhotoUpload(event,'s-photo-preview','carmela_photo')" />
+      </div>
+    </div>
+
+    <!-- Voice settings -->
+    <div class="settings-section">
+      <h2>🎙️ Para's Voice</h2>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Speaking rate</div>
+          <div class="setting-sub">How fast Para talks</div>
+        </div>
+        <input type="range" class="setting-range" id="s-rate" min="0.5" max="1.2" step="0.05" value="0.85"
+               style="width:120px" oninput="saveSetting('voice_rate',parseFloat(this.value));document.getElementById('s-rate-val').textContent=this.value" />
+      </div>
+      <div style="text-align:right;font-size:14px;color:#888;margin-top:-8px;padding-bottom:8px"><span id="s-rate-val">0.85</span>x</div>
+      <div class="setting-row">
+        <div class="setting-label">Test voice</div>
+        <button class="ob-btn ob-btn-primary" onclick="testParaVoice()" style="padding:8px 20px;font-size:15px;margin:0">🔊 Test</button>
+      </div>
+    </div>
+
+    <!-- Timing -->
+    <div class="settings-section">
+      <h2>⏱️ Timing</h2>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Choice timeout</div>
+          <div class="setting-sub">Seconds before Para repeats</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="range" class="setting-range" id="s-timeout" min="3" max="10" step="1" value="5"
+                 style="width:100px" oninput="saveSetting('timeout_sec',parseInt(this.value));document.getElementById('s-timeout-val').textContent=this.value+'s'" />
+          <span id="s-timeout-val" style="font-size:15px;font-weight:600;color:#555;min-width:30px">5s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Display -->
+    <div class="settings-section">
+      <h2>🎨 Display</h2>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Dark mode</div>
+          <div class="setting-sub">Easier on eyes at night</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="s-dark" onchange="toggleDarkMode(this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Haptic feedback</div>
+          <div class="setting-sub">Vibrate on card tap</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="s-haptic" checked onchange="saveSetting('haptic',this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Favorites manager -->
+    <div class="settings-section">
+      <h2>⭐ Carmela's Favorites</h2>
+      <div style="margin-bottom:12px">
+        <div style="font-size:15px;font-weight:600;color:#555;margin-bottom:6px">Music</div>
+        <div class="tags-wrap" id="s-fav-music"></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:15px;font-weight:600;color:#555;margin-bottom:6px">TV Shows</div>
+        <div class="tags-wrap" id="s-fav-tv"></div>
+      </div>
+      <div>
+        <div style="font-size:15px;font-weight:600;color:#555;margin-bottom:6px">Foods</div>
+        <div class="tags-wrap" id="s-fav-food"></div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="settings-section">
+      <h2>📋 Recent Choices</h2>
+      <ul class="history-list" id="history-list">
+        <li style="color:#aaa;font-size:15px;padding:12px 0">No choices yet — Carmela's responses will appear here.</li>
+      </ul>
+      <button class="ob-btn ob-btn-secondary" onclick="clearHistory()" style="margin-top:12px;width:100%;font-size:14px">Clear history</button>
+    </div>
+
+    <!-- Re-run onboarding -->
+    <div class="settings-section">
+      <h2>🔄 Setup</h2>
+      <button class="ob-btn ob-btn-primary" onclick="restartOnboarding()" style="width:100%">Re-run setup wizard</button>
+      <div style="margin-top:12px;font-size:13px;color:#aaa;text-align:center">Para v2 — built with love by Fame & Zayco</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     SERVICE WORKER REGISTRATION
+============================================================ -->
+<script>
+// ============================================================
+// SERVICE WORKER (inline, registered via blob)
+// ============================================================
+if ('serviceWorker' in navigator) {
+  const swCode = `
+const CACHE = 'para-v2-cache-v1';
+const CORE = ['/'];
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE).catch(()=>{})));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => { self.clients.claim(); });
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    fetch(e.request).catch(() => caches.match(e.request))
+  );
+});
+`;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+</script>
 
 <script>
-const categories = {
-  needs: [
-    {e:'💧',l:'Water'},    {e:'🍽️',l:'Food'},      {e:'🚽',l:'Bathroom'},
-    {e:'😴',l:'Rest'},     {e:'💊',l:'Medicine'},   {e:'🆘',l:'Help'},
-    {e:'📞',l:'Phone'},    {e:'🔥',l:'Too Hot'},    {e:'🥶',l:'Too Cold'},
-    {e:'😣',l:'Pain'},     {e:'🛏️',l:'Lie Down'},   {e:'👕',l:'Change Clothes'},
-    {e:'🛁',l:'Bath'},     {e:'🦯',l:'Wheelchair'}, {e:'👓',l:'Glasses'},
-    {e:'🔊',l:'Louder'},   {e:'🔇',l:'Quiet'},      {e:'💡',l:'Light'},
-  ],
-  feelings: [
-    {e:'😊',l:'Happy'},    {e:'😢',l:'Sad'},        {e:'😡',l:'Angry'},
-    {e:'😨',l:'Scared'},   {e:'😩',l:'Frustrated'}, {e:'😴',l:'Tired'},
-    {e:'🤢',l:'Sick'},     {e:'😌',l:'Calm'},       {e:'😍',l:'Love'},
-    {e:'😐',l:'Okay'},     {e:'🥳',l:'Excited'},    {e:'😞',l:'Upset'},
-    {e:'🤔',l:'Confused'}, {e:'😤',l:'Annoyed'},    {e:'🥰',l:'Loved'},
-    {e:'😬',l:'Nervous'},  {e:'🤩',l:'Amazed'},     {e:'😶',l:'Nothing'},
-  ],
-  body: [
-    {e:'🤕',l:'Head Hurts'},  {e:'🫀',l:'Chest Pain'}, {e:'🦷',l:'Tooth Hurts'},
-    {e:'👁️',l:'Eye Hurts'},   {e:'👂',l:'Ear Hurts'},  {e:'🤧',l:'Nose'},
-    {e:'🦴',l:'Bone Pain'},   {e:'🦵',l:'Leg Hurts'},  {e:'🤲',l:'Hand Hurts'},
-    {e:'🫁',l:'Hard to Breathe'},{e:'🤮',l:'Nausea'}, {e:'🔥',l:'Fever'},
-    {e:'😵',l:'Dizzy'},       {e:'💉',l:'Injection'},  {e:'🩺',l:'Doctor'},
-    {e:'🏥',l:'Hospital'},    {e:'💪',l:'Arm Hurts'},  {e:'👣',l:'Foot Hurts'},
-  ],
-  food: [
-    {e:'🍎',l:'Apple'},      {e:'🍌',l:'Banana'},     {e:'🍞',l:'Bread'},
-    {e:'🥛',l:'Milk'},       {e:'💧',l:'Water'},       {e:'🧃',l:'Juice'},
-    {e:'🍗',l:'Chicken'},    {e:'🥣',l:'Cereal'},      {e:'🍳',l:'Eggs'},
-    {e:'🥗',l:'Salad'},      {e:'🍕',l:'Pizza'},       {e:'🍝',l:'Pasta'},
-    {e:'🥤',l:'Soda'},       {e:'☕',l:'Coffee'},      {e:'🫖',l:'Tea'},
-    {e:'🍰',l:'Cake'},       {e:'🍪',l:'Cookie'},      {e:'🍫',l:'Chocolate'},
-    {e:'🥪',l:'Sandwich'},   {e:'🍜',l:'Soup'},        {e:'❌',l:'No Food'},
-  ],
-  activities: [
-    {e:'📺',l:'TV'},          {e:'📱',l:'Phone'},       {e:'🎵',l:'Music'},
-    {e:'📖',l:'Read'},        {e:'🎮',l:'Games'},       {e:'🚶',l:'Walk'},
-    {e:'🖐️',l:'Hold Hand'},  {e:'🤗',l:'Hug'},         {e:'🙏',l:'Pray'},
-    {e:'🧩',l:'Puzzle'},      {e:'✏️',l:'Write'},       {e:'🎨',l:'Draw'},
-    {e:'🌳',l:'Outside'},     {e:'🏠',l:'Home'},        {e:'🛒',l:'Shopping'},
-    {e:'💆',l:'Massage'},     {e:'🎭',l:'Movie'},       {e:'😴',l:'Sleep'},
-  ],
-  people: [
-    {e:'👩‍⚕️',l:'Nurse'},      {e:'🧑‍⚕️',l:'Doctor'},    {e:'👨',l:'Dad'},
-    {e:'👩',l:'Mom'},         {e:'👧',l:'Sister'},      {e:'👦',l:'Brother'},
-    {e:'👵',l:'Grandma'},     {e:'👴',l:'Grandpa'},     {e:'👫',l:'Friend'},
-    {e:'🧑',l:'Caregiver'},   {e:'🧑‍🏫',l:'Teacher'},   {e:'👩‍👧',l:'Family'},
-    {e:'🚑',l:'Ambulance'},   {e:'👮',l:'Police'},      {e:'🙋',l:'Me'},
-  ],
-  places: [
-    {e:'🏠',l:'Home'},        {e:'🏥',l:'Hospital'},    {e:'🚿',l:'Bathroom'},
-    {e:'🛏️',l:'Bedroom'},     {e:'🍽️',l:'Kitchen'},     {e:'🛋️',l:'Living Room'},
-    {e:'🚗',l:'Car'},         {e:'🏫',l:'School'},      {e:'🏪',l:'Store'},
-    {e:'🌳',l:'Outside'},     {e:'🏖️',l:'Park'},        {e:'⛪',l:'Church'},
-    {e:'🏋️',l:'Therapy'},     {e:'💈',l:'Salon'},       {e:'🚪',l:'Door'},
-  ],
-  phrases: [
-    'Yes please',            'No thank you',          'I need help',
-    'I am okay',             'I want to go home',     'I love you',
-    'Please stop',           'I am in pain',          'Call my family',
-    'I am hungry',           'I am thirsty',          'I need to use the bathroom',
-    'Please be quiet',       'Can you help me?',      'I feel sick',
-    'I understand',          'I do not understand',   'Please wait',
-    'Thank you',             'I am cold',             'I am hot',
-    'Please turn on the TV', 'I want music',          'I need my medicine',
-  ]
+// ============================================================
+// GLOBAL STATE
+// ============================================================
+const APP = {
+  userName: 'Carmela',
+  parentName: '',
+  voiceRate: 0.85,
+  timeoutSec: 5,
+  haptic: true,
+  darkMode: false,
+  selectedVoice: null,
+  listening: false,
+  recognition: null,
+  currentCards: [],
+  currentContext: '',
+  timeoutTimer: null,
+  timeoutCount: 0,
+  choiceHistory: [],
+  preferences: {},
+  favorites: {
+    music: ['Wheels on the Bus', 'Head Shoulders Knees', 'Pandora'],
+    tv: ['Xena', 'YouTube', 'Movie Time'],
+    food: ['Pasta', 'Mac & Cheese', 'Peanut Butter & Jelly', 'Pizza', 'Apple', 'Cookie'],
+    drinks: ['Milk', 'Juice', 'Water'],
+    activities: ['Bath', 'Rest', 'Walk', 'Hug', 'iPad'],
+  },
+  people: [],
+  speechSupported: false,
+  recognitionSupported: false,
+  speaking: false,
+  lastSelectedCard: null,
+  engageMode: false,
+  youtubeVisible: false,
+  knownVoiceProfile: null, // FUTURE: voice fingerprint API
 };
 
-let currentText = '';
-let speechRate = 0.9;
-let speechVol = 1;
-let selectedVoice = null;
-let countdownSecs = 5;
-let countdownTimer = null;
-let countdownCurrent = 0;
+// ============================================================
+// CARD DATABASE (PECS-style)
+// ============================================================
+const CARD_DB = {
+  food: [
+    { emoji: '🍝', label: 'Pasta' },
+    { emoji: '🧀', label: 'Mac & Cheese' },
+    { emoji: '🥜', label: 'Peanut Butter & Jelly' },
+    { emoji: '🍕', label: 'Pizza' },
+    { emoji: '🍎', label: 'Apple' },
+    { emoji: '🍌', label: 'Banana' },
+    { emoji: '🥪', label: 'Sandwich' },
+    { emoji: '🍪', label: 'Cookie' },
+    { emoji: '🍦', label: 'Ice Cream' },
+  ],
+  drinks: [
+    { emoji: '🥛', label: 'Milk' },
+    { emoji: '🧃', label: 'Juice' },
+    { emoji: '💧', label: 'Water' },
+    { emoji: '🍵', label: 'Tea' },
+  ],
+  tv: [
+    { emoji: '⚔️', label: 'Xena' },
+    { emoji: '📺', label: 'YouTube' },
+    { emoji: '🎬', label: 'Movie Time' },
+    { emoji: '📺', label: 'TV Time' },
+  ],
+  music: [
+    { emoji: '🎵', label: 'Wheels on the Bus' },
+    { emoji: '🎵', label: 'Head Shoulders Knees' },
+    { emoji: '🎶', label: 'My Music' },
+    { emoji: '🎵', label: 'Pandora' },
+  ],
+  activities: [
+    { emoji: '🛁', label: 'Bath' },
+    { emoji: '😴', label: 'Rest' },
+    { emoji: '🚶', label: 'Walk' },
+    { emoji: '🤗', label: 'Hug' },
+    { emoji: '🎮', label: 'Play' },
+    { emoji: '📱', label: 'iPad' },
+  ],
+  feelings: [
+    { emoji: '😊', label: 'Happy' },
+    { emoji: '😢', label: 'Sad' },
+    { emoji: '😤', label: 'Frustrated' },
+    { emoji: '😴', label: 'Tired' },
+    { emoji: '🤢', label: 'Sick' },
+    { emoji: '🥰', label: 'Loved' },
+  ],
+  yesno: [
+    { emoji: '✅', label: 'Yes', cls: 'yes-card' },
+    { emoji: '❌', label: 'No', cls: 'no-card' },
+  ],
+  responses: [
+    { emoji: '✅', label: 'Yes', cls: 'yes-card' },
+    { emoji: '❌', label: 'No', cls: 'no-card' },
+    { emoji: '🤔', label: 'Maybe' },
+    { emoji: '⏸', label: 'Wait' },
+  ],
+  people: [], // dynamically populated
+};
 
-const speechTextEl = document.getElementById('speechText');
-const speakBtn = document.getElementById('speakBtn');
+// YouTube favorites map
+const YT_FAVORITES = {
+  'wheels on the bus': 'https://www.youtube.com/embed/e_04ZrNroTo?autoplay=1',
+  'head shoulders knees': 'https://www.youtube.com/embed/h4eueDYPTIg?autoplay=1',
+  'head shoulders knees and toes': 'https://www.youtube.com/embed/h4eueDYPTIg?autoplay=1',
+  'xena': 'https://www.youtube.com/embed/Ux6Uu_TH0lE?autoplay=1',
+  'xena theme': 'https://www.youtube.com/embed/Ux6Uu_TH0lE?autoplay=1',
+};
 
-// Voices
-function loadVoices() {
-  const voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
-  const sel = document.getElementById('voiceSelect');
-  sel.innerHTML = voices.map((v,i) => `<option value="${i}">${v.name}</option>`).join('');
-  // prefer female voice
-  const femIdx = voices.findIndex(v => /female|woman|karen|samantha|victoria|zira|hazel/i.test(v.name));
-  if (femIdx >= 0) { sel.value = femIdx; selectedVoice = voices[femIdx]; }
-  else if (voices.length) selectedVoice = voices[0];
-}
-speechSynthesis.onvoiceschanged = loadVoices;
-window.addEventListener('load', () => setTimeout(loadVoices, 300));
+// Telegram config
+const TELEGRAM_BOT = '8638936501:AAFccfPU4lnuvDt2eb6GYuSXdXOp8Rz21gQ';
+const TELEGRAM_CHAT = '-1003201069573';
 
-function updateVoice() {
-  const voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
-  selectedVoice = voices[document.getElementById('voiceSelect').value];
-}
-function updateRate(v) { speechRate = parseFloat(v); }
-function updateVol(v) { speechVol = parseFloat(v); }
-function updateCountdown(v) {
-  countdownSecs = parseInt(v);
-  document.getElementById('countdownVal').textContent = v + 's';
-}
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  loadSettings();
+  checkSpeechSupport();
+  updateGreeting();
+  loadHistory();
+  loadFavorites();
 
-// Speak
-function speakText(text) {
-  speechSynthesis.cancel();
-  const utt = new SpeechSynthesisUtterance(text);
-  utt.rate = speechRate;
-  utt.volume = speechVol;
-  if (selectedVoice) utt.voice = selectedVoice;
-  utt.onstart = () => { speakBtn.textContent = '⏹ STOP'; speakBtn.classList.add('speaking'); };
-  utt.onend = () => { speakBtn.textContent = '▶ SPEAK'; speakBtn.classList.remove('speaking'); };
-  speechSynthesis.speak(utt);
-}
-
-function addWord(word) {
-  if (currentText) currentText += ' ' + word;
-  else currentText = word;
-  speechTextEl.textContent = currentText;
-  speechTextEl.classList.add('has-text');
-  if (countdownSecs > 0) triggerSpeak();
-}
-
-function triggerSpeak() {
-  if (countdownTimer) cancelCountdown();
-  if (!currentText.trim()) return;
-  if (countdownSecs === 0) { speakNow(); return; }
-  // Start countdown
-  countdownCurrent = countdownSecs;
-  const overlay = document.getElementById('countdownOverlay');
-  const numEl = document.getElementById('countdownNum');
-  numEl.textContent = countdownCurrent;
-  overlay.classList.add('active');
-  countdownTimer = setInterval(() => {
-    countdownCurrent--;
-    numEl.textContent = countdownCurrent;
-    numEl.style.animation = 'none';
-    numEl.offsetHeight; // reflow
-    numEl.style.animation = 'countScale 0.8s ease-in-out';
-    if (countdownCurrent <= 0) {
-      cancelCountdown();
-      speakNow();
-    }
-  }, 1000);
-}
-
-function cancelCountdown() {
-  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
-  document.getElementById('countdownOverlay').classList.remove('active');
-}
-
-function speakNow() {
-  if (currentText.trim()) speakText(currentText);
-}
-
-function clearSpeech() {
-  cancelCountdown();
-  speechSynthesis.cancel();
-  currentText = '';
-  speechTextEl.textContent = '';
-  speechTextEl.classList.remove('has-text');
-  speakBtn.textContent = '▶ SPEAK';
-  speakBtn.classList.remove('speaking');
-}
-
-function deleteLast() {
-  const words = currentText.trim().split(' ');
-  words.pop();
-  currentText = words.join(' ');
-  speechTextEl.textContent = currentText;
-  if (!currentText) speechTextEl.classList.remove('has-text');
-}
-
-// Category rendering
-function showCategory(cat, tabEl) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  if (tabEl) tabEl.classList.add('active');
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
-  grid.id = cat === 'phrases' ? 'phrasesGrid' : 'grid';
-  grid.style.gridTemplateColumns = '';
-
-  if (cat === 'phrases') {
-    grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-    categories.phrases.forEach(phrase => {
-      const card = document.createElement('div');
-      card.className = 'phrase-card';
-      card.innerHTML = `<div class="phrase-text">${phrase}</div>`;
-      card.addEventListener('click', () => addWord(phrase));
-      grid.appendChild(card);
-    });
+  // First run?
+  const setupDone = localStorage.getItem('para_setup_done');
+  if (!setupDone) {
+    showOnboarding();
   } else {
-    categories[cat].forEach(item => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `<div class="card-emoji">${item.e}</div><div class="card-label">${item.l}</div>`;
-      card.addEventListener('click', () => addWord(item.l));
-      grid.appendChild(card);
-    });
+    document.getElementById('onboarding-modal').classList.add('hidden');
+    greetCarmela();
+    startListening();
   }
 }
 
-// Help
-function showHelp() {
-  document.getElementById('helpOverlay').classList.add('active');
-}
-function closeHelp() {
-  document.getElementById('helpOverlay').classList.remove('active');
+// ============================================================
+// SPEECH SYNTHESIS
+// ============================================================
+function checkSpeechSupport() {
+  APP.speechSupported = 'speechSynthesis' in window;
+  APP.recognitionSupported = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+
+  if (APP.speechSupported) {
+    // Load voices (async on some browsers)
+    window.speechSynthesis.onvoiceschanged = () => {
+      selectBestVoice();
+      populateVoiceLists();
+    };
+    selectBestVoice();
+    populateVoiceLists();
+  }
+
+  if (!APP.recognitionSupported) {
+    document.getElementById('listen-indicator').style.display = 'none';
+  }
 }
 
-// Settings
+function selectBestVoice() {
+  if (!APP.speechSupported) return;
+  const voices = window.speechSynthesis.getVoices();
+  const savedVoice = localStorage.getItem('para_voice_name');
+
+  if (savedVoice) {
+    APP.selectedVoice = voices.find(v => v.name === savedVoice) || null;
+    if (APP.selectedVoice) return;
+  }
+
+  // Prefer female English voices
+  const preferred = ['Samantha', 'Karen', 'Moira', 'Tessa', 'Victoria',
+                     'Google UK English Female', 'Microsoft Zira', 'Microsoft Susan',
+                     'Alex'];
+  for (const name of preferred) {
+    const v = voices.find(v => v.name === name);
+    if (v) { APP.selectedVoice = v; return; }
+  }
+  // Fall back to any English voice
+  const eng = voices.find(v => v.lang.startsWith('en'));
+  APP.selectedVoice = eng || (voices.length ? voices[0] : null);
+}
+
+function paraSpeak(text, onEnd) {
+  if (!APP.speechSupported) {
+    updateParaStatus(text);
+    if (onEnd) setTimeout(onEnd, 1000);
+    return;
+  }
+  window.speechSynthesis.cancel();
+  APP.speaking = true;
+
+  const utter = new SpeechSynthesisUtterance(text);
+  if (APP.selectedVoice) utter.voice = APP.selectedVoice;
+  utter.rate  = APP.voiceRate;
+  utter.pitch = 1.05;
+  utter.volume = 1.0;
+
+  utter.onend = () => {
+    APP.speaking = false;
+    if (onEnd) onEnd();
+  };
+
+  utter.onerror = () => {
+    APP.speaking = false;
+    if (onEnd) onEnd();
+  };
+
+  updateParaStatus(text);
+  window.speechSynthesis.speak(utter);
+}
+
+function updateParaStatus(text) {
+  document.getElementById('para-text').textContent = text;
+}
+
+function testParaVoice() {
+  const name = localStorage.getItem('para_user_name') || 'Carmela';
+  paraSpeak(`Hi ${name}! I'm Para. I'm here with you, and I love helping you! 💛`);
+}
+
+// ============================================================
+// GREETING
+// ============================================================
+function greetCarmela() {
+  const hour = new Date().getHours();
+  let timeGreet = 'Good morning';
+  if (hour >= 12 && hour < 17) timeGreet = 'Good afternoon';
+  else if (hour >= 17) timeGreet = 'Good evening';
+
+  const name = APP.userName;
+  const parentName = APP.parentName ? ` ${APP.parentName} is here too.` : '';
+
+  setTimeout(() => {
+    paraSpeak(`${timeGreet} ${name}! I'm Para. I'm here with you.${parentName} What do you need today?`);
+  }, 800);
+}
+
+function updateGreeting() {
+  const name = APP.userName || 'Carmela';
+  document.getElementById('greeting-name').textContent = `Hi, ${name}! 💛`;
+  document.getElementById('idle-message').textContent = `Hi ${name}! 👋`;
+}
+
+// ============================================================
+// SPEECH RECOGNITION (Parent listening)
+// ============================================================
+function startListening() {
+  if (!APP.recognitionSupported) return;
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  APP.recognition = new SR();
+  APP.recognition.continuous = true;
+  APP.recognition.interimResults = true;
+  APP.recognition.lang = 'en-US';
+  APP.recognition.maxAlternatives = 1;
+
+  APP.recognition.onstart = () => {
+    APP.listening = true;
+    const ind = document.getElementById('listen-indicator');
+    ind.classList.add('active');
+    document.getElementById('listen-label').textContent = 'Listening…';
+  };
+
+  APP.recognition.onresult = (event) => {
+    let interim = '';
+    let final = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript;
+      if (event.results[i].isFinal) final += t;
+      else interim += t;
+    }
+
+    const display = final || interim;
+    if (display.trim().length > 2) showTranscript(display);
+    if (final.trim().length > 3) processParentSpeech(final.trim().toLowerCase());
+  };
+
+  APP.recognition.onerror = (e) => {
+    if (e.error !== 'no-speech') console.warn('SR error:', e.error);
+    // FUTURE: voice profile comparison for safety alert
+    restartListening();
+  };
+
+  APP.recognition.onend = () => {
+    APP.listening = false;
+    restartListening();
+  };
+
+  APP.recognition.start();
+}
+
+function restartListening() {
+  if (!APP.recognitionSupported) return;
+  setTimeout(() => {
+    try {
+      APP.recognition.start();
+    } catch(e) {}
+  }, 1200);
+}
+
+function showTranscript(text) {
+  const bubble = document.getElementById('transcript-bubble');
+  bubble.textContent = `"${text}"`;
+  bubble.classList.add('visible');
+  clearTimeout(APP.transcriptTimer);
+  APP.transcriptTimer = setTimeout(() => bubble.classList.remove('visible'), 3000);
+}
+
+// ============================================================
+// PARENT SPEECH PROCESSING (NLU)
+// ============================================================
+function processParentSpeech(text) {
+  // Para engage command
+  if (text.includes('para') && text.includes('engage')) {
+    triggerEngageMode();
+    return;
+  }
+
+  // Help
+  if (text.includes('help carmela') || text.includes('help me') && text.includes('para')) {
+    triggerHelp();
+    return;
+  }
+
+  // YouTube search: "para find [song]" or "find [song]" or "play [song]"
+  const ytMatch = text.match(/(?:para[,\s]+)?(?:find|search|play|put on)\s+(.+?)(?:\s+(?:for carmela|please|now))?$/i);
+  if (ytMatch && (text.includes('find') || text.includes('play') || text.includes('search'))) {
+    const query = ytMatch[1].trim();
+    handleYouTubeSearch(query);
+    return;
+  }
+
+  // "What do you want to watch?" / "What would you like to watch?"
+  if (/what.*want.*watch|what.*watch|what.*show|what.*movie/i.test(text)) {
+    showCategory('tv');
+    paraSpeak(`What would you like to watch, ${APP.userName}?`);
+    return;
+  }
+
+  // "How are you feeling?" / "How do you feel?"
+  if (/how.*feel|how.*doing|how.*are you/i.test(text)) {
+    showCategory('feelings');
+    paraSpeak(`How are you feeling right now, ${APP.userName}?`);
+    return;
+  }
+
+  // "What do you want to eat?" / "What would you like for lunch/dinner?"
+  if (/what.*eat|what.*food|what.*lunch|what.*dinner|what.*breakfast|what.*snack/i.test(text)) {
+    showCategory('food');
+    paraSpeak(`What would you like to eat, ${APP.userName}?`);
+    return;
+  }
+
+  // "What do you want to drink?" / "Thirsty?"
+  if (/what.*drink|want.*drink|thirsty|what.*have to drink/i.test(text)) {
+    showCategory('drinks');
+    paraSpeak(`What would you like to drink?`);
+    return;
+  }
+
+  // "What do you want to do?" / activity
+  if (/what.*do|want.*do|what.*activity|what.*play/i.test(text)) {
+    showCategory('activities');
+    paraSpeak(`What would you like to do?`);
+    return;
+  }
+
+  // "What music do you want?" / "What song?"
+  if (/what.*music|what.*song|want.*music|want.*listen/i.test(text)) {
+    showCategory('music');
+    paraSpeak(`What music would you like to hear?`);
+    return;
+  }
+
+  // "Would you like...?" / "Do you want...?" -> yes/no
+  if (/^(would you|do you want|are you|should we|can you|are you ready)/i.test(text)) {
+    // Extract the question, show yes/no
+    const q = text.replace(/^\w+\s+/, '').trim();
+    showYesNo(text);
+    paraSpeak(text.charAt(0).toUpperCase() + text.slice(1) + '?');
+    return;
+  }
+
+  // "Do you want [A] or [B]?" — extract choices
+  const orMatch = parseOrChoices(text);
+  if (orMatch && orMatch.length >= 2) {
+    showChoicesFromText(orMatch, text);
+    return;
+  }
+}
+
+// Parse "milk or juice" / "mac and cheese, peanut butter, or pasta"
+function parseOrChoices(text) {
+  // Remove filler
+  let t = text.replace(/^(do you want|would you like|how about|carmela,?\s*)/i, '').trim();
+  t = t.replace(/\?$/, '').trim();
+
+  // Split on "or" and commas
+  let parts = t.split(/,\s*|\s+or\s+/i).map(s => s.trim()).filter(s => s.length > 1 && s.length < 30);
+  if (parts.length < 2 || parts.length > 5) return null;
+
+  // Try to match each part to a card in the DB
+  return parts.map(p => findCardForText(p));
+}
+
+function findCardForText(text) {
+  const t = text.toLowerCase();
+  for (const cat of Object.values(CARD_DB)) {
+    if (!Array.isArray(cat)) continue;
+    for (const card of cat) {
+      if (card.label.toLowerCase().includes(t) || t.includes(card.label.toLowerCase())) {
+        return card;
+      }
+    }
+  }
+  // Return a generic card if no match
+  return { emoji: '❓', label: capitalize(text) };
+}
+
+function showChoicesFromText(cards, context) {
+  APP.currentContext = context;
+  const name = APP.userName;
+  paraSpeak(`${name}, your choices are: ${cards.map(c=>c.label).join(', or ')}.`, () => {
+    startChoiceTimeout();
+  });
+  renderCards(cards);
+}
+
+// ============================================================
+// CARD RENDERING
+// ============================================================
+function renderCards(cards) {
+  hideIdleScreen();
+  hideYoutube();
+
+  const container = document.getElementById('cards-container');
+  container.innerHTML = '';
+  container.style.display = 'flex';
+  container.className = 'fade-in';
+
+  APP.currentCards = cards;
+  APP.timeoutCount = 0;
+
+  cards.forEach((card, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-card ' + (card.cls || `card-color-${i % 8}`);
+    btn.setAttribute('aria-label', card.label);
+    btn.setAttribute('role', 'button');
+
+    // Timer ring SVG
+    const ringR = 11;
+    const ringCirc = 2 * Math.PI * ringR;
+    btn.innerHTML = `
+      <svg class="card-timer-ring ring-svg" viewBox="0 0 28 28" id="ring-${i}">
+        <circle class="ring-bg" cx="14" cy="14" r="${ringR}"/>
+        <circle class="ring-fg" cx="14" cy="14" r="${ringR}"
+          stroke-dasharray="${ringCirc}" stroke-dashoffset="0" id="ring-fg-${i}"/>
+      </svg>
+      <span class="card-emoji">${card.emoji}</span>
+      <span class="card-label">${card.label}</span>
+    `;
+
+    // Handle tap (pointer events for iPad)
+    btn.addEventListener('pointerdown', () => cardSelected(card, btn, i));
+    container.appendChild(btn);
+  });
+
+  // Show timeout bar
+  document.getElementById('timeout-bar-wrap').style.display = 'block';
+  startChoiceTimeout();
+}
+
+function showYesNo(question) {
+  APP.currentContext = question;
+  renderCards(CARD_DB.yesno);
+  paraSpeak(question);
+}
+
+function showCategory(cat) {
+  hideIdleScreen();
+  const cards = getTopCards(cat);
+  APP.currentContext = cat;
+  renderCards(cards);
+}
+
+// Get cards for a category, sorted by preference
+function getTopCards(category) {
+  let pool = [...(CARD_DB[category] || [])];
+  const prefs = APP.preferences[category] || {};
+
+  // Sort by preference score (most chosen first)
+  pool.sort((a, b) => (prefs[b.label] || 0) - (prefs[a.label] || 0));
+
+  // Limit to 5
+  return pool.slice(0, 5);
+}
+
+function hideIdleScreen() {
+  document.getElementById('idle-screen').style.display = 'none';
+}
+
+function showIdleScreen() {
+  document.getElementById('idle-screen').style.display = 'flex';
+  document.getElementById('idle-screen').style.flexDirection = 'column';
+  document.getElementById('cards-container').style.display = 'none';
+  document.getElementById('timeout-bar-wrap').style.display = 'none';
+  clearChoiceTimeout();
+  hideYoutube();
+  updateParaStatus('Para is here with you…');
+}
+
+// ============================================================
+// CARD SELECTION & FEEDBACK
+// ============================================================
+function cardSelected(card, btnEl, index) {
+  // Haptic feedback
+  if (APP.haptic && navigator.vibrate) navigator.vibrate([50, 30, 50]);
+
+  // Stop timeout
+  clearChoiceTimeout();
+
+  // Visual selection
+  btnEl.classList.add('selected');
+
+  // Save preference
+  savePreference(APP.currentContext, card.label);
+
+  // Save to history
+  saveToHistory(card, APP.currentContext);
+  APP.lastSelectedCard = card;
+
+  // Special actions
+  if (card.label === 'Wheels on the Bus' || card.label === 'Head Shoulders Knees') {
+    handleYouTubeSearch(card.label);
+    return;
+  }
+
+  if (card.label === 'YouTube') {
+    paraSpeak(`Opening YouTube! 🎬`);
+    setTimeout(() => window.open('https://youtube.com', '_blank'), 1000);
+    return;
+  }
+
+  if (card.label === 'Pandora') {
+    paraSpeak(`Opening Pandora! 🎵`);
+    setTimeout(() => window.open('https://pandora.com', '_blank'), 1000);
+    return;
+  }
+
+  if (card.label === 'iPad') {
+    paraSpeak(`iPad time! 📱`);
+  }
+
+  // Para speaks the confirmation
+  const confirmMsg = buildConfirmMessage(card);
+  paraSpeak(confirmMsg, () => {
+    setTimeout(() => {
+      showConfirmation(card);
+    }, 200);
+  });
+
+  // Celebration stars
+  spawnStars(btnEl);
+}
+
+function buildConfirmMessage(card) {
+  const name = APP.userName;
+  const templates = {
+    'Yes': [`Yes! Great answer, ${name}!`, `Yes it is! 💛`, `Yes! Wonderful, ${name}!`],
+    'No': [`No problem, ${name}!`, `Okay, no it is! That's okay.`, `Got it, no! We'll do something else.`],
+    'Happy': [`${name} is feeling happy! That's wonderful! 🌟`, `Happy! I love hearing that!`],
+    'Sad': [`${name} is feeling sad. I hear you. I'm right here with you. 💛`],
+    'Frustrated': [`${name} is frustrated. That's okay. Let's take a breath together.`],
+    'Tired': [`${name} is tired. Let's rest! 😴`],
+    'Sick': [`${name} isn't feeling well. I'll let someone know right away.`],
+    'Hug': [`${name} wants a hug! 🤗 Coming right up!`],
+  };
+
+  if (templates[card.label]) {
+    const arr = templates[card.label];
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  const genericTemplates = [
+    `${card.emoji} ${card.label}! Great choice, ${name}! 🌟`,
+    `${card.label}! I love that choice! 💛`,
+    `${card.label} it is! Let's do it! ✨`,
+  ];
+  return genericTemplates[Math.floor(Math.random() * genericTemplates.length)];
+}
+
+function showConfirmation(card) {
+  const box = document.getElementById('confirmation-box');
+  document.getElementById('confirmation-emoji').textContent = card.emoji;
+  document.getElementById('confirmation-text').textContent = card.label + '!';
+  document.getElementById('confirmation-sub').textContent = `Great choice, ${APP.userName}! 🌟`;
+
+  const overlay = document.getElementById('confirmation-overlay');
+  overlay.classList.add('visible');
+
+  setTimeout(() => {
+    overlay.classList.remove('visible');
+    showIdleScreen();
+  }, 2200);
+}
+
+function spawnStars(relativeTo) {
+  const rect = relativeTo ? relativeTo.getBoundingClientRect() :
+    { left: window.innerWidth/2, top: window.innerHeight/2, width: 100, height: 100 };
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top + rect.height/2;
+
+  const stars = ['⭐', '✨', '🌟', '💛', '💫', '⭐'];
+  stars.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'celebrate-star';
+    el.textContent = s;
+    el.style.left = cx + 'px';
+    el.style.top  = cy + 'px';
+    el.style.animationDelay = (i * 0.08) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1500);
+  });
+}
+
+// ============================================================
+// CHOICE TIMEOUT SYSTEM
+// ============================================================
+function startChoiceTimeout() {
+  clearChoiceTimeout();
+  const sec = APP.timeoutSec;
+
+  // Animate timeout bar
+  const bar = document.getElementById('timeout-bar');
+  bar.style.transition = 'none';
+  bar.style.width = '100%';
+  requestAnimationFrame(() => {
+    bar.style.transition = `width ${sec}s linear`;
+    bar.style.width = '0%';
+  });
+
+  // Animate rings on all cards
+  animateRings(sec);
+
+  APP.timeoutTimer = setTimeout(() => {
+    handleTimeout();
+  }, sec * 1000);
+}
+
+function animateRings(sec) {
+  APP.currentCards.forEach((_, i) => {
+    const ring = document.getElementById(`ring-fg-${i}`);
+    if (!ring) return;
+    const r = 11;
+    const circ = 2 * Math.PI * r;
+    ring.style.transition = 'none';
+    ring.style.strokeDashoffset = '0';
+    const ringWrap = document.getElementById(`ring-${i}`);
+    if (ringWrap) ringWrap.classList.add('visible');
+    requestAnimationFrame(() => {
+      ring.style.transition = `stroke-dashoffset ${sec}s linear`;
+      ring.style.strokeDashoffset = circ + 'px';
+    });
+  });
+}
+
+function clearChoiceTimeout() {
+  clearTimeout(APP.timeoutTimer);
+  const bar = document.getElementById('timeout-bar');
+  bar.style.transition = 'none';
+  bar.style.width = '100%';
+}
+
+function handleTimeout() {
+  APP.timeoutCount++;
+
+  if (APP.timeoutCount === 1) {
+    // Repeat once
+    const cards = APP.currentCards;
+    const options = cards.map(c => c.label).join(', or ');
+    paraSpeak(`${APP.userName}? Your choices are: ${options}. Take your time! 💛`, () => {
+      startChoiceTimeout();
+    });
+    // Re-animate rings
+    animateRings(APP.timeoutSec);
+  } else {
+    // Second timeout — select preferred or last
+    let pick = APP.currentCards[0];
+    const prefs = APP.preferences[APP.currentContext] || {};
+    let bestScore = -1;
+    for (const card of APP.currentCards) {
+      const score = prefs[card.label] || 0;
+      if (score > bestScore) { bestScore = score; pick = card; }
+    }
+    if (APP.lastSelectedCard) {
+      const last = APP.currentCards.find(c => c.label === APP.lastSelectedCard.label);
+      if (last) pick = last;
+    }
+
+    paraSpeak(`I'll go with ${pick.label} since that's what you loved before. 💛`);
+    // Find the button
+    const cards = document.querySelectorAll('.choice-card');
+    const idx = APP.currentCards.findIndex(c => c.label === pick.label);
+    if (idx >= 0 && cards[idx]) {
+      cardSelected(pick, cards[idx], idx);
+    } else {
+      showConfirmation(pick);
+      setTimeout(showIdleScreen, 2500);
+    }
+  }
+}
+
+// ============================================================
+// YOUTUBE SEARCH
+// ============================================================
+function handleYouTubeSearch(query) {
+  const q = query.toLowerCase().trim();
+
+  // Check favorites first
+  let embedUrl = null;
+  for (const [key, url] of Object.entries(YT_FAVORITES)) {
+    if (q.includes(key)) {
+      embedUrl = url;
+      break;
+    }
+  }
+
+  // Show searching animation
+  showSearching(`Searching for "${capitalize(query)}"…`);
+
+  setTimeout(() => {
+    hideSearching();
+
+    if (embedUrl) {
+      const title = capitalize(query);
+      paraSpeak(`I found ${title}! Should I play it for you?`, () => {
+        // Show yes/no with context
+        APP.pendingYouTubeUrl = embedUrl;
+        APP.pendingYouTubeTitle = title;
+        const confirmCards = [
+          { emoji: '▶️', label: 'Play it!', cls: 'yes-card' },
+          { emoji: '❌', label: 'Not now', cls: 'no-card' },
+        ];
+        renderCards(confirmCards);
+        // Override card selection for this context
+        APP.youtubeConfirmMode = true;
+      });
+    } else {
+      // FUTURE: YouTube Data API v3 search would happen here
+      // For now, open YouTube search
+      const ytSearch = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+      paraSpeak(`I found something for ${query}! Want to open YouTube?`);
+      APP.pendingYouTubeUrl = ytSearch;
+      APP.pendingYouTubeTitle = capitalize(query);
+
+      const confirmCards = [
+        { emoji: '▶️', label: 'Open YouTube', cls: 'yes-card' },
+        { emoji: '❌', label: 'Not now', cls: 'no-card' },
+      ];
+      renderCards(confirmCards);
+    }
+  }, 2000);
+}
+
+function playYouTube(url) {
+  if (url.includes('results')) {
+    window.open(url, '_blank');
+    return;
+  }
+  const iframe = document.getElementById('youtube-iframe');
+  iframe.src = url;
+  const container = document.getElementById('youtube-container');
+  container.classList.add('visible');
+  APP.youtubeVisible = true;
+  paraSpeak(`Playing ${APP.pendingYouTubeTitle || 'your video'}! Enjoy! 🎵`);
+}
+
+function hideYoutube() {
+  const iframe = document.getElementById('youtube-iframe');
+  iframe.src = '';
+  document.getElementById('youtube-container').classList.remove('visible');
+  APP.youtubeVisible = false;
+  APP.youtubeConfirmMode = false;
+}
+
+function showSearching(text) {
+  document.getElementById('searching-text').textContent = text;
+  document.getElementById('searching-overlay').classList.add('visible');
+}
+
+function hideSearching() {
+  document.getElementById('searching-overlay').classList.remove('visible');
+}
+
+// ============================================================
+// ENGAGE MODE
+// ============================================================
+function triggerEngageMode() {
+  APP.engageMode = true;
+  const questions = [
+    { q: `Carmela, what would you like to do right now?`, action: () => showCategory('activities') },
+    { q: `How are you feeling today, ${APP.userName}?`, action: () => showCategory('feelings') },
+    { q: `Xena is so amazing! Do you want to watch Xena?`, action: () => showYesNo('Do you want to watch Xena?') },
+    { q: `Are you hungry? Do you want a snack?`, action: () => showYesNo('Are you hungry?') },
+    { q: `Do you want to listen to music?`, action: () => showYesNo('Do you want to listen to music?') },
+    { q: `What's your favorite? Let's see…`, action: () => showCategory('food') },
+    { q: `Do you want a hug?`, action: () => showYesNo('Do you want a hug?') },
+  ];
+
+  const pick = questions[Math.floor(Math.random() * questions.length)];
+  paraSpeak(pick.q, () => {
+    setTimeout(() => {
+      pick.action();
+    }, 500);
+  });
+}
+
+function closeEngage() {
+  document.getElementById('engage-overlay').classList.remove('visible');
+}
+
+// ============================================================
+// HELP ME BUTTON
+// ============================================================
+async function triggerHelp() {
+  // Haptic
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+
+  // Para speaks loudly
+  const utter = new SpeechSynthesisUtterance(`I'M GETTING HELP FOR CARMELA RIGHT NOW!`);
+  if (APP.selectedVoice) utter.voice = APP.selectedVoice;
+  utter.rate = 0.9;
+  utter.volume = 1.0;
+  utter.pitch = 1.2;
+  if (APP.speechSupported) window.speechSynthesis.speak(utter);
+
+  updateParaStatus('🚨 GETTING HELP FOR CARMELA!');
+
+  // Visual alert
+  showAlert('🚨 HELP REQUESTED FOR CARMELA!');
+
+  // Send Telegram notification
+  try {
+    const msg = encodeURIComponent(
+      `🚨 HELP REQUESTED\n\n` +
+      `Carmela needs help RIGHT NOW!\n` +
+      `Time: ${new Date().toLocaleTimeString()}\n` +
+      `Date: ${new Date().toLocaleDateString()}\n\n` +
+      `— Para (Carmela's voice device)`
+    );
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage?chat_id=${TELEGRAM_CHAT}&text=${msg}`);
+  } catch(e) {
+    console.warn('Telegram notification failed:', e);
+    // FUTURE: retry queue for offline scenarios
+  }
+
+  // Log to history
+  saveToHistory({ emoji: '🚨', label: 'HELP requested' }, 'emergency');
+}
+
+// ============================================================
+// PREFERENCES & HISTORY
+// ============================================================
+function savePreference(context, choice) {
+  if (!APP.preferences[context]) APP.preferences[context] = {};
+  APP.preferences[context][choice] = (APP.preferences[context][choice] || 0) + 1;
+  localStorage.setItem('para_preferences', JSON.stringify(APP.preferences));
+}
+
+function loadHistory() {
+  const h = localStorage.getItem('para_history');
+  APP.choiceHistory = h ? JSON.parse(h) : [];
+  renderHistory();
+}
+
+function saveToHistory(card, context) {
+  const entry = {
+    emoji: card.emoji,
+    label: card.label,
+    context: context,
+    time: new Date().toISOString(),
+  };
+  APP.choiceHistory.unshift(entry);
+  if (APP.choiceHistory.length > 100) APP.choiceHistory = APP.choiceHistory.slice(0, 100);
+  localStorage.setItem('para_history', JSON.stringify(APP.choiceHistory));
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (!list) return;
+
+  if (!APP.choiceHistory.length) {
+    list.innerHTML = '<li style="color:#aaa;font-size:15px;padding:12px 0">No choices yet.</li>';
+    return;
+  }
+
+  list.innerHTML = APP.choiceHistory.slice(0, 20).map(entry => {
+    const t = new Date(entry.time);
+    const timeStr = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const dateStr = t.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    return `<li class="history-item">
+      <span class="history-icon">${entry.emoji}</span>
+      <div class="history-info">
+        <div class="history-choice">${entry.label}</div>
+        <div class="history-context">${entry.context}</div>
+      </div>
+      <span class="history-time">${timeStr}<br>${dateStr}</span>
+    </li>`;
+  }).join('');
+}
+
+function clearHistory() {
+  APP.choiceHistory = [];
+  localStorage.removeItem('para_history');
+  renderHistory();
+  showAlert('History cleared');
+}
+
+// ============================================================
+// SETTINGS PERSISTENCE
+// ============================================================
+function loadSettings() {
+  APP.userName     = localStorage.getItem('para_user_name') || 'Carmela';
+  APP.parentName   = localStorage.getItem('para_parent_name') || '';
+  APP.voiceRate    = parseFloat(localStorage.getItem('para_voice_rate') || '0.85');
+  APP.timeoutSec   = parseInt(localStorage.getItem('para_timeout_sec') || '5');
+  APP.haptic       = localStorage.getItem('para_haptic') !== 'false';
+  APP.darkMode     = localStorage.getItem('para_dark_mode') === 'true';
+
+  const prefs = localStorage.getItem('para_preferences');
+  APP.preferences  = prefs ? JSON.parse(prefs) : {};
+
+  const people = localStorage.getItem('para_people');
+  APP.people       = people ? JSON.parse(people) : [];
+
+  if (APP.darkMode) document.body.classList.add('dark-mode');
+
+  // Sync settings panel UI
+  requestAnimationFrame(() => {
+    const sName = document.getElementById('s-name');
+    if (sName) sName.value = APP.userName;
+
+    const sRate = document.getElementById('s-rate');
+    if (sRate) { sRate.value = APP.voiceRate; document.getElementById('s-rate-val').textContent = APP.voiceRate; }
+
+    const sTimeout = document.getElementById('s-timeout');
+    if (sTimeout) { sTimeout.value = APP.timeoutSec; document.getElementById('s-timeout-val').textContent = APP.timeoutSec + 's'; }
+
+    const sDark = document.getElementById('s-dark');
+    if (sDark) sDark.checked = APP.darkMode;
+
+    const sHaptic = document.getElementById('s-haptic');
+    if (sHaptic) sHaptic.checked = APP.haptic;
+
+    // CSS variable
+    document.documentElement.style.setProperty('--timeout', APP.timeoutSec);
+  });
+}
+
+function saveSetting(key, value) {
+  localStorage.setItem('para_' + key, value);
+  if (key === 'user_name') APP.userName = value;
+  if (key === 'voice_rate') APP.voiceRate = value;
+  if (key === 'timeout_sec') {
+    APP.timeoutSec = value;
+    document.documentElement.style.setProperty('--timeout', value);
+  }
+  if (key === 'haptic') APP.haptic = value;
+}
+
+// ============================================================
+// DARK MODE
+// ============================================================
+function toggleDarkMode(force) {
+  const isDark = force !== undefined ? force : !APP.darkMode;
+  APP.darkMode = isDark;
+  document.body.classList.toggle('dark-mode', isDark);
+  localStorage.setItem('para_dark_mode', isDark);
+  document.getElementById('dark-btn').textContent = isDark ? '☀️' : '🌙';
+  const sDark = document.getElementById('s-dark');
+  if (sDark) sDark.checked = isDark;
+}
+
+// ============================================================
+// FAVORITES
+// ============================================================
+function loadFavorites() {
+  const saved = localStorage.getItem('para_favorites');
+  if (saved) {
+    try { APP.favorites = JSON.parse(saved); } catch(e) {}
+  }
+  renderFavoritesTags();
+}
+
+function renderFavoritesTags() {
+  renderTagsFor('fav-music-tags', APP.favorites.music || [], 'music', CARD_DB.music);
+  renderTagsFor('fav-tv-tags',    APP.favorites.tv    || [], 'tv',    CARD_DB.tv);
+  renderTagsFor('fav-food-tags',  APP.favorites.food  || [], 'food',  CARD_DB.food);
+  renderTagsFor('fav-drink-tags', APP.favorites.drinks|| [], 'drinks',CARD_DB.drinks);
+
+  renderTagsFor('s-fav-music', APP.favorites.music || [], 'music', CARD_DB.music);
+  renderTagsFor('s-fav-tv',    APP.favorites.tv    || [], 'tv',    CARD_DB.tv);
+  renderTagsFor('s-fav-food',  APP.favorites.food  || [], 'food',  CARD_DB.food);
+}
+
+function renderTagsFor(containerId, activeFavs, category, pool) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  pool.forEach(card => {
+    const isActive = activeFavs.includes(card.label);
+    const tag = document.createElement('div');
+    tag.className = 'tag' + (isActive ? ' active' : '');
+    tag.innerHTML = `${card.emoji} ${card.label}`;
+    tag.onclick = () => toggleFavorite(category, card.label, tag);
+    wrap.appendChild(tag);
+  });
+
+  // Add custom button
+  const addBtn = document.createElement('div');
+  addBtn.className = 'add-tag-btn';
+  addBtn.innerHTML = '+ Add';
+  addBtn.onclick = () => {
+    const label = prompt(`Add a custom ${category} option:`);
+    if (label && label.trim()) {
+      const newCard = { emoji: '⭐', label: label.trim() };
+      CARD_DB[category] = CARD_DB[category] || [];
+      CARD_DB[category].push(newCard);
+      toggleFavorite(category, label.trim(), null);
+      renderFavoritesTags();
+    }
+  };
+  wrap.appendChild(addBtn);
+}
+
+function toggleFavorite(category, label, tagEl) {
+  if (!APP.favorites[category]) APP.favorites[category] = [];
+  const idx = APP.favorites[category].indexOf(label);
+  if (idx >= 0) {
+    APP.favorites[category].splice(idx, 1);
+    if (tagEl) tagEl.classList.remove('active');
+  } else {
+    APP.favorites[category].push(label);
+    if (tagEl) tagEl.classList.add('active');
+  }
+  localStorage.setItem('para_favorites', JSON.stringify(APP.favorites));
+}
+
+// ============================================================
+// VOICE LIST (for onboarding & settings)
+// ============================================================
+function populateVoiceLists() {
+  const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  const engVoices = voices.filter(v => v.lang.startsWith('en')).slice(0, 10);
+
+  ['voice-list'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '';
+    engVoices.forEach(v => {
+      const div = document.createElement('div');
+      div.className = 'voice-option' + (APP.selectedVoice && APP.selectedVoice.name === v.name ? ' selected' : '');
+      div.innerHTML = `<span style="font-size:20px">🎙️</span><div><div class="voice-name">${v.name}</div><div class="voice-lang">${v.lang}</div></div>`;
+      div.onclick = () => {
+        APP.selectedVoice = v;
+        localStorage.setItem('para_voice_name', v.name);
+        el.querySelectorAll('.voice-option').forEach(o => o.classList.remove('selected'));
+        div.classList.add('selected');
+      };
+      el.appendChild(div);
+    });
+    if (!engVoices.length) {
+      el.innerHTML = '<div style="color:#888;font-size:15px;">No voices found. Your device will use its default voice.</div>';
+    }
+  });
+}
+
+function updateRateDisplay(val) {
+  document.getElementById('rate-display').textContent = parseFloat(val).toFixed(2);
+  APP.voiceRate = parseFloat(val);
+  localStorage.setItem('para_voice_rate', val);
+}
+
+// ============================================================
+// ONBOARDING
+// ============================================================
+let obStep = 0;
+const OB_TOTAL = 6;
+
+function showOnboarding() {
+  document.getElementById('onboarding-modal').classList.remove('hidden');
+  obStep = 0;
+  obRender();
+  renderFavoritesTags();
+  populateVoiceLists();
+  renderPeopleList();
+}
+
+function obNavigate(dir) {
+  const isLast = obStep === OB_TOTAL - 1;
+  if (isLast && dir > 0) {
+    // Save and finish
+    finishOnboarding();
+    return;
+  }
+  obStep = Math.max(0, Math.min(OB_TOTAL - 1, obStep + dir));
+  obRender();
+}
+
+function obRender() {
+  // Steps
+  document.querySelectorAll('.ob-step').forEach((el, i) => {
+    el.classList.toggle('active', i === obStep);
+  });
+
+  // Progress dots
+  document.querySelectorAll('.ob-dot').forEach((el, i) => {
+    el.classList.toggle('done', i < obStep);
+  });
+
+  // Back button
+  document.getElementById('ob-back-btn').style.display = obStep > 0 ? 'block' : 'none';
+
+  // Next button text
+  const nextBtn = document.getElementById('ob-next-btn');
+  nextBtn.textContent = obStep === OB_TOTAL - 1 ? "Let's go! 💛" : 'Next →';
+}
+
+function finishOnboarding() {
+  // Save name and other basics
+  const name = document.getElementById('ob-name').value.trim() || 'Carmela';
+  const parent = document.getElementById('ob-parent-name').value.trim();
+  const rate = document.getElementById('ob-rate').value;
+  const timeout = document.getElementById('ob-timeout').value;
+
+  localStorage.setItem('para_user_name', name);
+  localStorage.setItem('para_parent_name', parent);
+  localStorage.setItem('para_voice_rate', rate);
+  localStorage.setItem('para_timeout_sec', timeout);
+  localStorage.setItem('para_setup_done', '1');
+
+  APP.userName = name;
+  APP.parentName = parent;
+  APP.voiceRate = parseFloat(rate);
+  APP.timeoutSec = parseInt(timeout);
+
+  document.getElementById('onboarding-modal').classList.add('hidden');
+  loadSettings();
+  updateGreeting();
+  loadFavorites();
+  greetCarmela();
+  startListening();
+}
+
+function restartOnboarding() {
+  closeSettings();
+  showOnboarding();
+}
+
+// ============================================================
+// PEOPLE (Step 2 of onboarding)
+// ============================================================
+function addPersonEntry() {
+  const list = document.getElementById('people-list');
+  const idx = list.children.length;
+
+  const row = document.createElement('div');
+  row.style.cssText = 'background:rgba(255,255,255,0.6);border-radius:16px;padding:16px;display:flex;gap:12px;align-items:center';
+
+  row.innerHTML = `
+    <div style="position:relative;flex-shrink:0">
+      <img id="person-photo-${idx}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='30' fill='%23f8d5b0'/%3E%3Ctext x='30' y='42' text-anchor='middle' font-size='30'%3E👤%3C/text%3E%3C/svg%3E"
+           style="width:60px;height:60px;border-radius:50%;object-fit:cover;cursor:pointer"
+           onclick="document.getElementById('person-file-${idx}').click()">
+      <input type="file" id="person-file-${idx}" accept="image/*" style="display:none"
+             onchange="handlePhotoUpload(event,'person-photo-${idx}','person_photo_${idx}')">
+    </div>
+    <input class="ob-input" style="flex:1;margin:0" placeholder="Name (e.g. Dad, Mom, Grandma)"
+           id="person-name-${idx}" onchange="savePerson(${idx})" />
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#ccc">✕</button>
+  `;
+  list.appendChild(row);
+}
+
+function savePerson(idx) {
+  // FUTURE: voice fingerprint API for person recognition would link here
+  const name = document.getElementById(`person-name-${idx}`)?.value;
+  const photo = localStorage.getItem(`person_photo_${idx}`) || '';
+  if (!name) return;
+  APP.people = APP.people.filter(p => p.idx !== idx);
+  APP.people.push({ idx, name, photo });
+  localStorage.setItem('para_people', JSON.stringify(APP.people));
+
+  // Add to CARD_DB people category
+  CARD_DB.people = APP.people.map(p => ({ emoji: '👤', label: p.name, photo: p.photo }));
+}
+
+function renderPeopleList() {
+  const list = document.getElementById('people-list');
+  if (!list) return;
+  list.innerHTML = '';
+  APP.people.forEach(p => {
+    const row = document.createElement('div');
+    row.style.cssText = 'background:rgba(255,255,255,0.6);border-radius:16px;padding:16px;display:flex;gap:12px;align-items:center';
+    row.innerHTML = `
+      <img src="${p.photo || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='30' fill='%23f8d5b0'/%3E%3Ctext x='30' y='42' text-anchor='middle' font-size='30'%3E👤%3C/text%3E%3C/svg%3E"}"
+           style="width:60px;height:60px;border-radius:50%;object-fit:cover">
+      <div style="font-size:18px;font-weight:600;color:#333">${p.name}</div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+// ============================================================
+// PHOTO UPLOAD
+// ============================================================
+function handlePhotoUpload(event, previewId, storageKey) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = e.target.result;
+    const preview = document.getElementById(previewId);
+    if (preview) preview.src = data;
+    localStorage.setItem(storageKey, data);
+    if (storageKey === 'carmela_photo') {
+      document.getElementById('idle-para-icon').textContent = '🤝';
+      // Could show photo in idle screen — FUTURE enhancement
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// ============================================================
+// SETTINGS PANEL
+// ============================================================
 function openSettings() {
-  document.getElementById('settingsPanel').classList.add('active');
+  loadHistory();
+  renderFavoritesTags();
+  document.getElementById('settings-panel').classList.add('open');
 }
+
 function closeSettings() {
-  document.getElementById('settingsPanel').classList.remove('active');
+  document.getElementById('settings-panel').classList.remove('open');
 }
 
-// Init
-showCategory('needs', null);
-document.querySelector('.tab').classList.add('active');
+// ============================================================
+// ALERT / NOTIFICATION HELPER
+// ============================================================
+function showAlert(text) {
+  const bar = document.getElementById('alert-bar');
+  bar.textContent = text;
+  bar.classList.add('show');
+  clearTimeout(APP.alertTimer);
+  APP.alertTimer = setTimeout(() => bar.classList.remove('show'), 3500);
+}
 
-// Prevent sleep on iOS (requires user gesture first)
-document.addEventListener('touchstart', () => {
-  if (speechSynthesis.paused) speechSynthesis.resume();
-}, { once: true });
+// ============================================================
+// UTILITY
+// ============================================================
+function capitalize(s) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// ============================================================
+// SAFETY ALERT (unknown voice)
+// ============================================================
+// FUTURE: voice profile comparison API
+// When voice fingerprint doesn't match known parent profiles:
+function showSafetyAlert() {
+  const el = document.getElementById('safety-alert');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 8000);
+}
+
+// ============================================================
+// QUICK ACTION OVERRIDES (YouTube confirm flow)
+// ============================================================
+// Intercept "Play it!" / "Open YouTube" card taps
+const _originalCardSelected = cardSelected;
+window.cardSelected_override = function(card, btnEl, index) {
+  if (APP.youtubeConfirmMode) {
+    APP.youtubeConfirmMode = false;
+    if (card.label === 'Play it!' || card.label === 'Open YouTube') {
+      clearChoiceTimeout();
+      btnEl.classList.add('selected');
+      spawnStars(btnEl);
+      if (APP.haptic && navigator.vibrate) navigator.vibrate([50, 30, 50]);
+      setTimeout(() => {
+        playYouTube(APP.pendingYouTubeUrl);
+        document.getElementById('cards-container').style.display = 'none';
+      }, 600);
+      saveToHistory({ emoji: '▶️', label: 'Played: ' + (APP.pendingYouTubeTitle || 'video') }, 'youtube');
+    } else {
+      // "Not now"
+      clearChoiceTimeout();
+      btnEl.classList.add('selected');
+      if (APP.haptic && navigator.vibrate) navigator.vibrate(30);
+      paraSpeak('No problem! Let me know if you change your mind. 💛');
+      setTimeout(showIdleScreen, 1800);
+    }
+    return;
+  }
+  _originalCardSelected(card, btnEl, index);
+};
+
+// Patch cardSelected to check for override
+(function() {
+  const origRender = window.renderCards;
+  window.renderCards = function(cards) {
+    origRender(cards);
+    // Re-bind pointer events with override
+    const container = document.getElementById('cards-container');
+    const btns = container.querySelectorAll('.choice-card');
+    btns.forEach((btn, i) => {
+      btn.replaceWith(btn.cloneNode(true));
+    });
+    const newBtns = container.querySelectorAll('.choice-card');
+    newBtns.forEach((btn, i) => {
+      btn.addEventListener('pointerdown', () => window.cardSelected_override(cards[i], btn, i));
+    });
+  };
+})();
+
+// ============================================================
+// KEYBOARD SHORTCUT (for testing / accessibility)
+// ============================================================
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') showIdleScreen();
+  if (e.key === 'h' && e.ctrlKey) triggerHelp();
+  if (e.key === 'e' && e.ctrlKey) triggerEngageMode();
+  if (e.key === 'y' && e.ctrlKey) showYesNo('Are you okay?');
+});
+
+// ============================================================
+// VISIBILITY API — pause/resume recognition
+// ============================================================
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    try { APP.recognition && APP.recognition.stop(); } catch(e) {}
+  } else {
+    setTimeout(() => {
+      if (!APP.listening) startListening();
+    }, 1000);
+  }
+});
+
+// ============================================================
+// LAUNCH
+// ============================================================
+window.addEventListener('DOMContentLoaded', init);
+
 </script>
 </body>
 </html>
