@@ -357,6 +357,108 @@
   @keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
   .card-bounce { animation: bounce 0.4s ease; }
   @keyframes star-pop { 0%{transform:scale(0) rotate(0deg);opacity:1} 100%{transform:scale(1.5) rotate(180deg);opacity:0} }
+
+  /* ─── QUICK ASK PANEL ─────────────────────── */
+  #quick-ask-btn {
+    position: fixed; bottom: 72px; left: 12px;
+    height: 52px; padding: 0 16px; border-radius: 26px;
+    background: var(--purple); border: 3px solid var(--purple-light);
+    color: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(108,63,200,0.5);
+    z-index: 45; display: flex; align-items: center; gap: 6px;
+    transition: transform 0.1s;
+  }
+  #quick-ask-btn:active { transform: scale(0.95); }
+
+  #quick-ask-panel {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--card-bg);
+    border-top: 3px solid var(--purple-light);
+    border-radius: 24px 24px 0 0;
+    padding: 20px 16px 32px;
+    z-index: 200;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-height: 85vh; overflow-y: auto;
+  }
+  #quick-ask-panel.open { transform: translateY(0); }
+
+  #qa-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 199; display: none;
+  }
+  #qa-backdrop.visible { display: block; }
+
+  .qa-handle {
+    width: 40px; height: 5px; border-radius: 3px;
+    background: rgba(255,255,255,0.3);
+    margin: 0 auto 20px;
+  }
+  .qa-title {
+    font-size: 1.1rem; font-weight: 700; color: var(--yellow);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .qa-subtitle {
+    font-size: 0.8rem; color: var(--text-soft); text-transform: uppercase;
+    letter-spacing: 1px; margin: 16px 0 8px;
+  }
+
+  #qa-choices-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .qa-choice-row { display: flex; gap: 8px; align-items: center; }
+  .qa-choice-input {
+    flex: 1; padding: 12px 14px; border-radius: 12px;
+    background: rgba(255,255,255,0.08); border: 2px solid var(--purple-light);
+    color: var(--text); font-size: 1rem; outline: none;
+  }
+  .qa-choice-input:focus { border-color: var(--yellow); }
+  .qa-del-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(231,76,60,0.2); border: none;
+    color: var(--red); font-size: 1.1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #qa-add-choice {
+    background: none; border: 2px dashed var(--purple-light);
+    color: var(--text-soft); border-radius: 12px;
+    padding: 10px; width: 100%; cursor: pointer; font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+  #qa-add-choice:hover { border-color: var(--yellow); color: var(--yellow); }
+
+  .qa-action-row { display: flex; gap: 8px; margin-bottom: 20px; }
+  .qa-ask-btn {
+    flex: 1; padding: 14px; border-radius: 50px;
+    background: var(--green); border: none; color: #fff;
+    font-size: 1.1rem; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(46,204,113,0.4);
+  }
+  .qa-save-btn {
+    padding: 14px 16px; border-radius: 50px;
+    background: rgba(255,255,255,0.1); border: 2px solid var(--purple-light);
+    color: var(--text-soft); font-size: 0.9rem; cursor: pointer;
+  }
+
+  /* Saved templates */
+  #qa-templates { display: flex; flex-direction: column; gap: 8px; }
+  .qa-template {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,0.05); border-radius: 12px;
+    padding: 10px 12px; cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .qa-template:active { border-color: var(--purple-light); }
+  .qa-template-name { font-weight: 700; font-size: 0.95rem; flex: 1; }
+  .qa-template-choices { font-size: 0.8rem; color: var(--text-soft); }
+  .qa-template-del {
+    background: none; border: none; color: var(--text-soft);
+    font-size: 1rem; cursor: pointer; padding: 4px;
+  }
+  .qa-template-del:hover { color: var(--red); }
+  .qa-empty-templates {
+    text-align: center; color: var(--text-soft);
+    font-size: 0.85rem; padding: 12px; font-style: italic;
+  }
 </style>
 </head>
 <body>
@@ -480,6 +582,36 @@
   <button id="help-btn" onclick="triggerHelp()" aria-label="Help Me">🚨</button>
   <div id="help-btn-label">HELP ME</div>
 
+  <!-- Quick Ask button -->
+  <button id="quick-ask-btn" onclick="openQuickAsk()">👐 Quick Ask</button>
+
+</div>
+
+<!-- ═══════════ QUICK ASK PANEL ═══════════ -->
+<div id="qa-backdrop" onclick="closeQuickAsk()"></div>
+<div id="quick-ask-panel">
+  <div class="qa-handle"></div>
+  <div class="qa-title">👐 Quick Ask Carmela</div>
+
+  <div class="qa-subtitle">Type the choices</div>
+  <div id="qa-choices-list">
+    <div class="qa-choice-row">
+      <input class="qa-choice-input" type="text" placeholder="e.g. Mac & Cheese" maxlength="30">
+    </div>
+    <div class="qa-choice-row">
+      <input class="qa-choice-input" type="text" placeholder="e.g. Pizza" maxlength="30">
+      <button class="qa-del-btn" onclick="removeQaChoice(this)">×</button>
+    </div>
+  </div>
+  <button id="qa-add-choice" onclick="addQaChoice()">+ Add another choice</button>
+
+  <div class="qa-action-row">
+    <button class="qa-ask-btn" onclick="fireQuickAsk()">Ask Carmela ✨</button>
+    <button class="qa-save-btn" onclick="saveQaTemplate()">💾 Save</button>
+  </div>
+
+  <div class="qa-subtitle">Saved Sets</div>
+  <div id="qa-templates"><div class="qa-empty-templates">No saved sets yet. Build one above and tap 💾 Save.</div></div>
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -1254,6 +1386,114 @@ function saveSettings() {
   if (sv) state.voiceName = sv.value;
   saveState();
   document.getElementById('para-greeting').textContent = `Hi ${state.childName}!`;
+}
+
+// ═══════════════════════════════════════════
+// QUICK ASK PANEL
+// ═══════════════════════════════════════════
+
+function openQuickAsk() {
+  renderQaTemplates();
+  document.getElementById('quick-ask-panel').classList.add('open');
+  document.getElementById('qa-backdrop').classList.add('visible');
+  // Focus first input
+  setTimeout(() => {
+    const first = document.querySelector('#qa-choices-list .qa-choice-input');
+    if (first) first.focus();
+  }, 350);
+}
+
+function closeQuickAsk() {
+  document.getElementById('quick-ask-panel').classList.remove('open');
+  document.getElementById('qa-backdrop').classList.remove('visible');
+}
+
+function addQaChoice() {
+  const list = document.getElementById('qa-choices-list');
+  if (list.children.length >= 4) { toast('Maximum 4 choices'); return; }
+  const row = document.createElement('div');
+  row.className = 'qa-choice-row';
+  row.innerHTML = `
+    <input class="qa-choice-input" type="text" placeholder="Another choice…" maxlength="30">
+    <button class="qa-del-btn" onclick="removeQaChoice(this)">×</button>
+  `;
+  list.appendChild(row);
+  row.querySelector('input').focus();
+}
+
+function removeQaChoice(btn) {
+  const row = btn.closest('.qa-choice-row');
+  const list = document.getElementById('qa-choices-list');
+  if (list.children.length <= 2) { toast('Need at least 2 choices'); return; }
+  row.remove();
+}
+
+function getQaChoices() {
+  return Array.from(document.querySelectorAll('#qa-choices-list .qa-choice-input'))
+    .map(i => i.value.trim())
+    .filter(Boolean);
+}
+
+function fireQuickAsk() {
+  const choices = getQaChoices();
+  if (choices.length < 2) { toast('Enter at least 2 choices'); return; }
+  closeQuickAsk();
+  showChoiceCards(choices);
+}
+
+function saveQaTemplate() {
+  const choices = getQaChoices();
+  if (choices.length < 2) { toast('Enter at least 2 choices to save'); return; }
+  const name = prompt(`Name this set (e.g. "Dinner", "TV Time"):`, choices.slice(0,2).join(' / '));
+  if (!name) return;
+  const templates = getQaTemplates();
+  templates.push({ name: name.trim(), choices });
+  localStorage.setItem('para_qa_templates', JSON.stringify(templates));
+  renderQaTemplates();
+  toast(`"${name}" saved! ✅`);
+}
+
+function getQaTemplates() {
+  try { return JSON.parse(localStorage.getItem('para_qa_templates') || '[]'); } catch(e) { return []; }
+}
+
+function loadQaTemplate(idx) {
+  const templates = getQaTemplates();
+  const t = templates[idx];
+  if (!t) return;
+  closeQuickAsk();
+  showChoiceCards(t.choices);
+}
+
+function deleteQaTemplate(idx, e) {
+  e.stopPropagation();
+  const templates = getQaTemplates();
+  templates.splice(idx, 1);
+  localStorage.setItem('para_qa_templates', JSON.stringify(templates));
+  renderQaTemplates();
+}
+
+function renderQaTemplates() {
+  const container = document.getElementById('qa-templates');
+  const templates = getQaTemplates();
+  if (!templates.length) {
+    container.innerHTML = '<div class="qa-empty-templates">No saved sets yet. Build one above and tap 💾 Save.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  templates.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'qa-template';
+    div.onclick = () => loadQaTemplate(i);
+    div.innerHTML = `
+      <div style="flex:1">
+        <div class="qa-template-name">${t.name}</div>
+        <div class="qa-template-choices">${t.choices.join(' · ')}</div>
+      </div>
+      <button class="qa-template-del" onclick="deleteQaTemplate(${i}, event)" title="Delete">🗑</button>
+    `;
+    container.appendChild(div);
+  });
 }
 
 // ═══════════════════════════════════════════
